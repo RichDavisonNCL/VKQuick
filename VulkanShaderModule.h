@@ -1,0 +1,30 @@
+/******************************************************************************
+This file is part of the QuickVK
+
+Author:Rich Davison
+Contact:richgdavison@gmail.com
+License: MIT (see LICENSE file at the top of the source tree)
+*//////////////////////////////////////////////////////////////////////////////
+#pragma once
+#include "../NCLCoreClasses/Shader.h"
+
+namespace QuickVK {
+	class VulkanShaderModule  {
+	public:
+		VulkanShaderModule(const std::string& filename,  vk::ShaderStageFlagBits moduleStage, vk::Device device);
+
+		~VulkanShaderModule() = default;
+		void CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage = {})		const;
+		void CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges)						const;
+
+	//protected:		
+		void AddReflectionData(uint32_t dataSize, const void* data, vk::ShaderStageFlags stage);	
+
+		std::vector<std::vector<vk::DescriptorSetLayoutBinding>>	m_allLayoutsBindings;
+
+		std::vector< vk::PushConstantRange>		m_pushConstants;
+
+		vk::UniqueShaderModule				m_shaderModule;
+		vk::ShaderStageFlagBits				m_shaderStage;
+	};
+}
