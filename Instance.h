@@ -101,8 +101,6 @@ namespace QuickVK {
 	};
 
 	class Instance {
-		friend class VulkanMesh;
-		friend class VulkanTexture;
 	public:
 		Instance(const QuickVKInitialisation& vkInit);
 		~Instance();

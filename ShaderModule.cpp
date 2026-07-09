@@ -16,7 +16,7 @@ using std::ifstream;
 
 using namespace QuickVK;
 
-VulkanShaderModule::VulkanShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
+ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
 	char* data;
 	size_t dataSize = 0;
 	//Assets::ReadBinaryFile(Assets::SHADERDIR + "VK/" + filename, &data, dataSize);
@@ -40,7 +40,7 @@ VulkanShaderModule::VulkanShaderModule(const std::string& filename, vk::ShaderSt
 	m_shaderStage = stage;
 }
 
-void VulkanShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage) const {
+void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage) const {
 	const int numSets = std::max(inoutBindings.size(), m_allLayoutsBindings.size());
 	inoutBindings.resize(numSets);
 
@@ -74,7 +74,7 @@ void VulkanShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::Descr
 	}
 }
 
-void VulkanShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges) const {
+void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges) const {
 	for (int i = 0; i < m_pushConstants.size(); ++i) {
 		bool found = false;
 		for (int j = 0; j < inoutRanges.size(); ++j) {
@@ -91,7 +91,7 @@ void VulkanShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstant
 	}
 }
 
-void VulkanShaderModule::AddReflectionData(uint32_t dataSize, const void* data, vk::ShaderStageFlags stage) {
+void ShaderModule::AddReflectionData(uint32_t dataSize, const void* data, vk::ShaderStageFlags stage) {
 	SpvReflectShaderModule module;
 	SpvReflectResult result = spvReflectCreateShaderModule(dataSize, data, &module);
 	assert(result == SPV_REFLECT_RESULT_SUCCESS);

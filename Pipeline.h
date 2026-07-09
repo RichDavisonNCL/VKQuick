@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-struct VulkanPipeline {
+struct Pipeline {
 	vk::UniquePipeline			pipeline;
 	vk::UniquePipelineLayout	layout;
 

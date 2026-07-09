@@ -37,7 +37,7 @@ set(Source_Files
     "DescriptorSetLayoutBuilder.cpp"
     "DynamicRenderBuilder.cpp"
 	"TextureBuilder.cpp"
-    #"VulkanMesh.cpp"
+    #"Mesh.cpp"
     "PipelineBuilder.cpp"
     "Instance.cpp"
     "RenderPassBuilder.cpp"

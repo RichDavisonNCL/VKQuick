@@ -31,19 +31,19 @@ namespace QuickVK {
 		TextureBuilder& WithLayerCount(uint32_t layers);
 
 		//Builds an empty texture
-		UniqueVulkanTexture Build(const std::string& debugName = "");
+		UniqueTexture Build(const std::string& debugName = "");
 
 		//Builds a specifically sized texture using provided data is input
-		UniqueVulkanTexture BuildFromData(void* dataSrc, size_t byteCount, const std::string& debugName = "");
+		UniqueTexture BuildFromData(void* dataSrc, size_t byteCount, const std::string& debugName = "");
 
 		//Builds a texture loaded from file
-		UniqueVulkanTexture BuildFromFile(const std::string& filename);
+		UniqueTexture BuildFromFile(const std::string& filename);
 
 		//Builds an empty cubemap
-		UniqueVulkanTexture BuildCubemap(const std::string& debugName = "");
+		UniqueTexture BuildCubemap(const std::string& debugName = "");
 
 		//Builds a cubemap from file set
-		UniqueVulkanTexture BuildCubemapFromFile(
+		UniqueTexture BuildCubemapFromFile(
 			const std::string& negativeXFile, const std::string& positiveXFile,
 			const std::string& negativeYFile, const std::string& positiveYFile,
 			const std::string& negativeZFile, const std::string& positiveZFile,	
@@ -63,9 +63,9 @@ namespace QuickVK {
 			char* dataSrcs[6]		= { nullptr };
 		};
 
-		void FinaliseTexture(const std::string& debugName, vk::CommandBuffer& usingBuffer, TextureJob& job, UniqueVulkanTexture& t);
+		void FinaliseTexture(const std::string& debugName, vk::CommandBuffer& usingBuffer, TextureJob& job, UniqueTexture& t);
 
-		UniqueVulkanTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, vk::Extent2D dimensions, bool isCube, const std::string& debugName);
+		UniqueTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, vk::Extent2D dimensions, bool isCube, const std::string& debugName);
 
 		void UploadTextureData(vk::CommandBuffer buffer, TextureJob& job);
 

@@ -7,14 +7,14 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 namespace QuickVK {
-	class VulkanTexture;
+	class Texture;
 	class RenderPassBuilder	{
 	public:
 		RenderPassBuilder(vk::Device m_sourceDevice);
 		~RenderPassBuilder() = default;
 
 		RenderPassBuilder& WithColourAttachment(
-			VulkanTexture* texture, 
+			Texture* texture, 
 			bool clear	= true,
 			vk::ImageLayout startLayout = vk::ImageLayout::eColorAttachmentOptimal, 
 			vk::ImageLayout useLayout	= vk::ImageLayout::eColorAttachmentOptimal,
@@ -22,7 +22,7 @@ namespace QuickVK {
 		);
 
 		RenderPassBuilder& WithDepthAttachment(
-			VulkanTexture* texture, 
+			Texture* texture, 
 			bool clear	= true,
 			vk::ImageLayout startLayout = vk::ImageLayout::eDepthAttachmentOptimal,
 			vk::ImageLayout useLayout	= vk::ImageLayout::eDepthAttachmentOptimal,
@@ -30,7 +30,7 @@ namespace QuickVK {
 		);
 
 		RenderPassBuilder& WithDepthStencilAttachment(
-			VulkanTexture* texture,
+			Texture* texture,
 			bool clear = true,
 			vk::ImageLayout startLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
 			vk::ImageLayout useLayout	= vk::ImageLayout::eDepthStencilAttachmentOptimal,

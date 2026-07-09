@@ -74,7 +74,7 @@ namespace QuickVK {
 		}
 		~PipelineBuilderBase() = default;
 
-		void FillShaderModules(VulkanPipeline& output) {
+		void FillShaderModules(Pipeline& output) {
 			for (int i = 0; i < m_usedModules.size(); ++i) {
 				vk::PipelineShaderStageCreateInfo stageInfo;
 
@@ -88,7 +88,7 @@ namespace QuickVK {
 			m_pipelineCreate.setPStages(m_shaderStages.data());
 		}
 
-		void FillShaderLayouts(VulkanPipeline& output) {
+		void FillShaderLayouts(Pipeline& output) {
 			if (m_externalLayout) {
 				m_pipelineCreate.setLayout(m_externalLayout);
 			}
@@ -102,7 +102,7 @@ namespace QuickVK {
 			}
 		}
 
-		void FinaliseLayout(VulkanPipeline& output) {
+		void FinaliseLayout(Pipeline& output) {
 			if (m_pipelineCreateBits & vk::PipelineCreateFlagBits2::eDescriptorHeapEXT) {
 				return;
 			}
@@ -150,8 +150,8 @@ namespace QuickVK {
 		std::vector< vk::DescriptorSetLayout>	m_userLayouts;
 
 		std::vector<vk::PipelineShaderStageCreateInfo>	m_shaderStages;
-		std::vector<const VulkanShaderModule*>			m_usedModules;
-		std::vector<UniqueVulkanShaderModule>			m_loadedShaderModules;
+		std::vector<const ShaderModule*>			m_usedModules;
+		std::vector<UniqueShaderModule>			m_loadedShaderModules;
 		std::vector<std::string>						m_moduleEntryPoints;
 	};
 }

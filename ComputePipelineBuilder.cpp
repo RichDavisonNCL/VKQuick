@@ -14,20 +14,20 @@ ComputePipelineBuilder::ComputePipelineBuilder(vk::Device device) : PipelineBuil
 }
 
 ComputePipelineBuilder& ComputePipelineBuilder::WithShaderBinary(const std::string& filename, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<VulkanShaderModule>(filename, vk::ShaderStageFlagBits::eCompute, m_sourceDevice));
+	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(filename, vk::ShaderStageFlagBits::eCompute, m_sourceDevice));
 	m_usedModules.push_back(m_loadedShaderModules.back().get());
 	m_entryPoint	= entrypoint;
 	return *this;
 }
 
-ComputePipelineBuilder& ComputePipelineBuilder::WithShaderModule(const VulkanShaderModule& module, const std::string& entrypoint) {
+ComputePipelineBuilder& ComputePipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
 	m_usedModules.push_back(&module);
 	m_entryPoint	= entrypoint;
 	return *this;
 }
 
-VulkanPipeline	ComputePipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
-	VulkanPipeline output;
+Pipeline	ComputePipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
+	Pipeline output;
 	assert(!m_usedModules.empty());
 
 	FillShaderLayouts(output);

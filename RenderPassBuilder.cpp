@@ -16,7 +16,7 @@ RenderPassBuilder::RenderPassBuilder(vk::Device m_device) {
 	m_sourceDevice = m_device;
 }
 
-//RenderPassBuilder& RenderPassBuilder::WithColourAttachment(VulkanTexture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout,  vk::ImageLayout endLayout) {
+//RenderPassBuilder& RenderPassBuilder::WithColourAttachment(Texture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout,  vk::ImageLayout endLayout) {
 //	m_allDescriptions.emplace_back(
 //		vk::AttachmentDescription()
 //		.setInitialLayout(startLayout)
@@ -29,7 +29,7 @@ RenderPassBuilder::RenderPassBuilder(vk::Device m_device) {
 //	return *this;
 //}
 //
-//RenderPassBuilder& RenderPassBuilder::WithDepthAttachment(VulkanTexture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout, vk::ImageLayout endLayout) {
+//RenderPassBuilder& RenderPassBuilder::WithDepthAttachment(Texture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout, vk::ImageLayout endLayout) {
 //	m_allDescriptions.emplace_back(
 //		vk::AttachmentDescription()
 //		.setInitialLayout(startLayout)
@@ -42,7 +42,7 @@ RenderPassBuilder::RenderPassBuilder(vk::Device m_device) {
 //	return *this;
 //}
 
-RenderPassBuilder& RenderPassBuilder::WithDepthStencilAttachment(VulkanTexture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout, vk::ImageLayout endLayout) {
+RenderPassBuilder& RenderPassBuilder::WithDepthStencilAttachment(Texture* texture, bool clear, vk::ImageLayout startLayout, vk::ImageLayout useLayout, vk::ImageLayout endLayout) {
 	return WithDepthAttachment(texture, clear, startLayout, useLayout, endLayout); //we just get different default parameters!
 }
 

@@ -11,23 +11,23 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 namespace QuickVK {
 
-	class VulkanRayTracingPipelineBuilder : 
-		public PipelineBuilderBase< VulkanRayTracingPipelineBuilder, vk::RayTracingPipelineCreateInfoKHR> {
+	class RayTracingPipelineBuilder : 
+		public PipelineBuilderBase< RayTracingPipelineBuilder, vk::RayTracingPipelineCreateInfoKHR> {
 	public:
-		VulkanRayTracingPipelineBuilder(vk::Device m_device);
-		~VulkanRayTracingPipelineBuilder();
+		RayTracingPipelineBuilder(vk::Device m_device);
+		~RayTracingPipelineBuilder();
 
-		VulkanRayTracingPipelineBuilder& WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main");
-		VulkanRayTracingPipelineBuilder& WithShaderModule(const VulkanShaderModule& module, const std::string& entrypoint = "main");
+		RayTracingPipelineBuilder& WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main");
+		RayTracingPipelineBuilder& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main");
 
-		VulkanRayTracingPipelineBuilder& WithRayGenGroup(uint32_t shaderIndex);
-		VulkanRayTracingPipelineBuilder& WithMissGroup(uint32_t shaderIndex);
-		VulkanRayTracingPipelineBuilder& WithTriangleHitGroup(uint32_t closestHit = VK_SHADER_UNUSED_KHR, uint32_t anyHit = VK_SHADER_UNUSED_KHR);
-		VulkanRayTracingPipelineBuilder& WithProceduralHitGroup(uint32_t intersection, uint32_t closestHit = VK_SHADER_UNUSED_KHR, uint32_t anyHit = VK_SHADER_UNUSED_KHR);
+		RayTracingPipelineBuilder& WithRayGenGroup(uint32_t shaderIndex);
+		RayTracingPipelineBuilder& WithMissGroup(uint32_t shaderIndex);
+		RayTracingPipelineBuilder& WithTriangleHitGroup(uint32_t closestHit = VK_SHADER_UNUSED_KHR, uint32_t anyHit = VK_SHADER_UNUSED_KHR);
+		RayTracingPipelineBuilder& WithProceduralHitGroup(uint32_t intersection, uint32_t closestHit = VK_SHADER_UNUSED_KHR, uint32_t anyHit = VK_SHADER_UNUSED_KHR);
 
-		VulkanRayTracingPipelineBuilder& WithRecursionDepth(uint32_t count);
+		RayTracingPipelineBuilder& WithRecursionDepth(uint32_t count);
 
-		VulkanPipeline Build(const std::string& debugName = "", vk::PipelineCache cache = {});
+		Pipeline Build(const std::string& debugName = "", vk::PipelineCache cache = {});
 
 	protected:
 		std::vector<vk::RayTracingShaderGroupCreateInfoKHR> m_genGroups;

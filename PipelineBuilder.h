@@ -63,9 +63,9 @@ namespace QuickVK {
 		PipelineBuilder& WithDynamicState(vk::DynamicState state);
 
 		PipelineBuilder& WithShaderBinary(const std::string& filename , vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main");
-		PipelineBuilder& WithShaderModule(const VulkanShaderModule& module, const std::string& entrypoint = "main");
+		PipelineBuilder& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main");
 
-		VulkanPipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
+		Pipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
 
 		vk::PipelineRenderingCreateInfoKHR& GetRenderingCreateInfo()  {
 			return m_renderingCreate;

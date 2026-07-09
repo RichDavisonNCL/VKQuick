@@ -23,9 +23,9 @@ namespace QuickVK {
 		~ComputePipelineBuilder() {}
 
 		ComputePipelineBuilder& WithShaderBinary(const std::string& filename, const std::string& entrypoint = "main");
-		ComputePipelineBuilder& WithShaderModule(const VulkanShaderModule& module, const std::string& entrypoint = "main");
+		ComputePipelineBuilder& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main");
 
-		VulkanPipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
+		Pipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
 
 	protected:
 		std::string			m_entryPoint;

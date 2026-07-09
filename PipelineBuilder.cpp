@@ -156,20 +156,20 @@ PipelineBuilder& PipelineBuilder::WithTessellationPatchVertexCount(uint32_t cont
 }
 
 PipelineBuilder& PipelineBuilder::WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<VulkanShaderModule>(filename, stage, m_sourceDevice));
+	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(filename, stage, m_sourceDevice));
 	m_usedModules.push_back(m_loadedShaderModules.back().get());
 	m_moduleEntryPoints.push_back(entrypoint);
 	return *this;
 }
 
 
-PipelineBuilder& PipelineBuilder::WithShaderModule(const VulkanShaderModule& module, const std::string& entrypoint) {
+PipelineBuilder& PipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
 	m_usedModules.push_back(&module);
 	m_moduleEntryPoints.push_back(entrypoint);
 	return *this;
 }
 
-VulkanPipeline	PipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
+Pipeline	PipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
 	m_blendCreate.setAttachments(m_blendAttachStates);
 	m_blendCreate.setBlendConstants({ 1.0f, 1.0f, 1.0f, 1.0f });
 
@@ -183,7 +183,7 @@ VulkanPipeline	PipelineBuilder::Build(const std::string& debugName, vk::Pipeline
 
 	vk::Format stencilRenderingFormat = vk::Format::eUndefined; //TODO
 
-	VulkanPipeline output;
+	Pipeline output;
 
 	m_pipelineCreate.setPColorBlendState(&m_blendCreate)
 		.setPDepthStencilState(&m_depthStencilCreate)

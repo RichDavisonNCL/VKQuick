@@ -9,11 +9,11 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "../NCLCoreClasses/Shader.h"
 
 namespace QuickVK {
-	class VulkanShaderModule  {
+	class ShaderModule  {
 	public:
-		VulkanShaderModule(const std::string& filename,  vk::ShaderStageFlagBits moduleStage, vk::Device device);
+		ShaderModule(const std::string& filename,  vk::ShaderStageFlagBits moduleStage, vk::Device device);
 
-		~VulkanShaderModule() = default;
+		~ShaderModule() = default;
 		void CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage = {})		const;
 		void CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges)						const;
 
