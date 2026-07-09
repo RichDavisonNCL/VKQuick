@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -10,13 +10,13 @@ License: MIT (see LICENSE file at the top of the source tree)
 namespace QuickVK {
 	class MemoryManager;
 	//A buffer, backed by memory we have allocated elsewhere
-	class VulkanBuffer {
+	class Buffer {
 	public:		
 		friend class MemoryManager;
-		VulkanBuffer();
-		VulkanBuffer(VulkanBuffer&& obj);
-		virtual ~VulkanBuffer();
-		VulkanBuffer& operator=(VulkanBuffer&& obj);
+		Buffer();
+		Buffer(Buffer&& obj);
+		virtual ~Buffer();
+		Buffer& operator=(Buffer&& obj);
 
 		vk::Buffer	buffer;
 		size_t		size = 0;

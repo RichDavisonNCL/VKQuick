@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Buffer.h"
-#include "VulkanTexture.h"
+#include "Texture.h"
 
 namespace QuickVK {
 	enum class DiscardMode {
@@ -19,14 +19,14 @@ namespace QuickVK {
 	public:
 		virtual ~MemoryManager() {};
 
-		virtual VulkanBuffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memoryProperties, const std::string& debugName = "") = 0;
+		virtual Buffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memoryProperties, const std::string& debugName = "") = 0;
 
-		virtual VulkanBuffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						= 0;
-		virtual void			DiscardBuffer(VulkanBuffer& buffer, DiscardMode discard = DiscardMode::Deferred)		= 0;
+		virtual Buffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						= 0;
+		virtual void			DiscardBuffer(Buffer& buffer, DiscardMode discard = DiscardMode::Deferred)		= 0;
 
-		virtual void*			MapBuffer(const VulkanBuffer& buffer)		= 0;
-		virtual void			UnmapBuffer(const VulkanBuffer& buffer)	= 0;
-		virtual void			CopyData(const VulkanBuffer& buffer, void* data, size_t size, size_t offset = 0) = 0;
+		virtual void*			MapBuffer(const Buffer& buffer)		= 0;
+		virtual void			UnmapBuffer(const Buffer& buffer)	= 0;
+		virtual void			CopyData(const Buffer& buffer, void* data, size_t size, size_t offset = 0) = 0;
 
 		virtual void			Update() = 0;
 
@@ -42,17 +42,17 @@ namespace QuickVK {
 		}
 	
 	protected:
-		VulkanBuffer	AllocateBuffer() {
-			VulkanBuffer b;
+		Buffer	AllocateBuffer() {
+			Buffer b;
 			b.m_sourceManager = this;
 			return b;
 		}
 
-		uint32_t GetBufferID(const VulkanBuffer& b) const {
+		uint32_t GetBufferID(const Buffer& b) const {
 			return b.m_bufferID;
 		}
 
-		void	SetBufferID(VulkanBuffer& b, uint32_t id) {
+		void	SetBufferID(Buffer& b, uint32_t id) {
 			b.m_bufferID = id;
 		}
 

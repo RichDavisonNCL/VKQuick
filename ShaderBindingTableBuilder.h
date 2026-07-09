@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -22,20 +22,20 @@ namespace QuickVK {
 	};
 
 	struct ShaderBindingTable {
-		VulkanBuffer tableBuffer;
+		Buffer tableBuffer;
 		vk::StridedDeviceAddressRegionKHR regions[BindingTableOrder::MAX_SIZE];
 	};
 
-	class VulkanShaderBindingTableBuilder {
+	class ShaderBindingTableBuilder {
 	public:
-		VulkanShaderBindingTableBuilder(const std::string& debugName = "");
-		~VulkanShaderBindingTableBuilder() = default;
+		ShaderBindingTableBuilder(const std::string& debugName = "");
+		~ShaderBindingTableBuilder() = default;
 
-		VulkanShaderBindingTableBuilder& WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR properties);
+		ShaderBindingTableBuilder& WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR properties);
 
-		VulkanShaderBindingTableBuilder& WithPipeline(vk::Pipeline pipe, const vk::RayTracingPipelineCreateInfoKHR& createInfo);
+		ShaderBindingTableBuilder& WithPipeline(vk::Pipeline pipe, const vk::RayTracingPipelineCreateInfoKHR& createInfo);
 
-		VulkanShaderBindingTableBuilder& WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo);
+		ShaderBindingTableBuilder& WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo);
 
 		ShaderBindingTable Build(vk::Device device, MemoryManager& memManager);
 

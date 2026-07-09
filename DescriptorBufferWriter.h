@@ -1,11 +1,12 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
+#include "Buffer.h"
 
 namespace QuickVK {
 	/*
@@ -15,7 +16,7 @@ namespace QuickVK {
 	*/
 	class DescriptorBufferWriter {
 	public:
-		DescriptorBufferWriter(vk::Device inDevice, vk::DescriptorSetLayout inLayout, VulkanBuffer& inBuffer, vk::PhysicalDeviceDescriptorBufferPropertiesEXT& inProps)
+		DescriptorBufferWriter(vk::Device inDevice, vk::DescriptorSetLayout inLayout, Buffer& inBuffer, vk::PhysicalDeviceDescriptorBufferPropertiesEXT& inProps)
 		 : m_destBuffer(inBuffer)
 		 , m_props(inProps)	{
 			m_device = inDevice;
@@ -30,7 +31,7 @@ namespace QuickVK {
 			}
 		}
 
-		DescriptorBufferWriter& WriteBuffer(uint32_t binding, vk::DescriptorType type, const VulkanBuffer& buffer, uint32_t arrayIndex = 0) 
+		DescriptorBufferWriter& WriteBuffer(uint32_t binding, vk::DescriptorType type, const Buffer& buffer, uint32_t arrayIndex = 0)
 		{
 			vk::DescriptorAddressInfoEXT descriptorAddress{
 				.address	= buffer.deviceAddress,
@@ -83,7 +84,7 @@ namespace QuickVK {
 
 	protected:
 		vk::Device				m_device;
-		VulkanBuffer&			m_destBuffer;
+		Buffer&					m_destBuffer;
 		void*					m_descriptorBufferMemory;
 		vk::DescriptorSetLayout m_layout;
 		vk::PhysicalDeviceDescriptorBufferPropertiesEXT& m_props;

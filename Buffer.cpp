@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -10,13 +10,13 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 using namespace QuickVK;
 
-VulkanBuffer::VulkanBuffer() {
+Buffer::Buffer() {
 	buffer = nullptr;
 	size = 0;
 	deviceAddress = 0;
 }
 
-VulkanBuffer::VulkanBuffer(VulkanBuffer&& obj)  {
+Buffer::Buffer(Buffer&& obj)  {
 	buffer			= obj.buffer;
 	deviceAddress	= obj.deviceAddress;
 	size			= obj.size;
@@ -29,7 +29,7 @@ VulkanBuffer::VulkanBuffer(VulkanBuffer&& obj)  {
 	obj.size		= 0;
 }
 
-VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& obj) {
+Buffer& Buffer::operator=(Buffer&& obj) {
 	if (this != &obj) {
 		buffer			= obj.buffer;
 		deviceAddress	= obj.deviceAddress;
@@ -45,20 +45,20 @@ VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& obj) {
 	return *this;
 }
 
-VulkanBuffer::~VulkanBuffer() {
+Buffer::~Buffer() {
 	if (buffer && m_sourceManager) {
 		m_sourceManager->DiscardBuffer(*this);
 	}
 }
 
-void VulkanBuffer::CopyData(void* data, size_t size) const {
+void Buffer::CopyData(void* data, size_t size) const {
 	m_sourceManager->CopyData(*this, data, size);
 }
 
-void* VulkanBuffer::Map() const {
+void* Buffer::Map() const {
 	return m_sourceManager->MapBuffer(*this);
 }
 
-void	VulkanBuffer::Unmap() const {
+void	Buffer::Unmap() const {
 	m_sourceManager->UnmapBuffer(*this);
 }

@@ -1,12 +1,12 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanTextureBuilder.h"
-#include "VulkanTexture.h"
+#include "TextureBuilder.h"
+#include "Texture.h"
 #include "Utils.h"
 //#include "TextureLoader.h"
 //

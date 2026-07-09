@@ -1,12 +1,12 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanRenderPassBuilder.h"
-#include "VulkanTexture.h"
+#include "RenderPassBuilder.h"
+#include "Texture.h"
 #include "Utils.h"
 
 using namespace QuickVK;

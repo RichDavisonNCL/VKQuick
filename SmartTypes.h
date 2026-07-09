@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -10,7 +10,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 namespace QuickVK {
 	class VulkanMesh;
 	class VulkanTexture;
-	class VulkanBuffer;
+	class Buffer;
 	class VulkanShaderModule;
 
 	using UniqueVulkanMesh		= std::unique_ptr<VulkanMesh>;
@@ -19,8 +19,8 @@ namespace QuickVK {
 	using UniqueVulkanTexture	= std::unique_ptr<VulkanTexture>;
 	using SharedVulkanTexture	= std::shared_ptr<VulkanTexture>;
 
-	using UniqueVulkanBuffer	= std::unique_ptr<VulkanBuffer>;
-	using SharedVulkanBuffer	= std::shared_ptr<VulkanBuffer>;
+	using UniqueBuffer	= std::unique_ptr<Buffer>;
+	using SharedBuffer	= std::shared_ptr<Buffer>;
 
 	using UniqueVulkanShaderModule = std::unique_ptr<VulkanShaderModule>;
 	using SharedVulkanShaderModule = std::shared_ptr<VulkanShaderModule>;

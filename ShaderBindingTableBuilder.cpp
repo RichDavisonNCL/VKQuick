@@ -1,36 +1,36 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanShaderBindingTableBuilder.h"
+#include "ShaderBindingTableBuilder.h"
 #include "Buffer.h"
 
 using namespace QuickVK;
 
-VulkanShaderBindingTableBuilder::VulkanShaderBindingTableBuilder(const std::string& inDebugName) {
+ShaderBindingTableBuilder::ShaderBindingTableBuilder(const std::string& inDebugName) {
 	debugName = debugName;
 }
 
-VulkanShaderBindingTableBuilder& VulkanShaderBindingTableBuilder::WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR deviceProps) {
+ShaderBindingTableBuilder& ShaderBindingTableBuilder::WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR deviceProps) {
 	properties = deviceProps;
 	return *this;
 }
 
-VulkanShaderBindingTableBuilder& VulkanShaderBindingTableBuilder::WithPipeline(vk::Pipeline inPipe, const vk::RayTracingPipelineCreateInfoKHR& inPipeCreateInfo) {
+ShaderBindingTableBuilder& ShaderBindingTableBuilder::WithPipeline(vk::Pipeline inPipe, const vk::RayTracingPipelineCreateInfoKHR& inPipeCreateInfo) {
 	pipeline = inPipe;
 	pipeCreateInfo = &inPipeCreateInfo;
 	return *this;
 }
 
-VulkanShaderBindingTableBuilder& VulkanShaderBindingTableBuilder::WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo) {
+ShaderBindingTableBuilder& ShaderBindingTableBuilder::WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo) {
 	libraries.push_back(&createInfo);
 	return *this;
 }
 
-void VulkanShaderBindingTableBuilder::FillCounts(const vk::RayTracingPipelineCreateInfoKHR* fromInfo) {
+void ShaderBindingTableBuilder::FillCounts(const vk::RayTracingPipelineCreateInfoKHR* fromInfo) {
 	for (int i = 0; i < fromInfo->groupCount; ++i) {
 		if (fromInfo->pGroups[i].type == vk::RayTracingShaderGroupTypeKHR::eGeneral) {
 			int shaderType = fromInfo->pGroups[i].generalShader;
@@ -62,7 +62,7 @@ int MakeMultipleOf(int input, int multiple) {
 	return count * multiple;
 }
 
-ShaderBindingTable VulkanShaderBindingTableBuilder::Build(vk::Device device, MemoryManager& memManager) {
+ShaderBindingTable ShaderBindingTableBuilder::Build(vk::Device device, MemoryManager& memManager) {
 	assert(pipeCreateInfo);
 	assert(pipeline);
 

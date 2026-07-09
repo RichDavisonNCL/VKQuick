@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -64,7 +64,7 @@ namespace QuickVK {
 		vk::Fence			presentFence;
 	};
 
-	struct VulkanInitialisation {
+	struct QuickVKInitialisation {
 		vk::Format			depthStencilFormat	= vk::Format::eD32SfloatS8Uint;
 		vk::PresentModeKHR  idealPresentMode	= vk::PresentModeKHR::eFifo;
 
@@ -104,7 +104,7 @@ namespace QuickVK {
 		friend class VulkanMesh;
 		friend class VulkanTexture;
 	public:
-		Instance(const VulkanInitialisation& vkInit);
+		Instance(const QuickVKInitialisation& vkInit);
 		~Instance();
 
 		virtual bool HasInitialised() const { return m_device; }
@@ -164,7 +164,7 @@ namespace QuickVK {
 
 		bool	InitDeviceQueueIndices();
 	private:
-		VulkanInitialisation		m_vkInit;
+		QuickVKInitialisation		m_vkInit;
 
 		vk::Instance				m_instance;			//API Instance
 		vk::PhysicalDevice			m_physicalDevice;	//GPU in use

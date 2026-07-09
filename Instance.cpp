@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -7,9 +7,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "Instance.h"
 //#include "VulkanMesh.h"
-#include "VulkanTexture.h"
-#include "VulkanTextureBuilder.h"
-#include "VulkanDescriptorSetLayoutBuilder.h"
+#include "Texture.h"
+#include "TextureBuilder.h"
+#include "DescriptorSetLayoutBuilder.h"
 
 #include "Utils.h"
 
@@ -23,7 +23,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 //
 using namespace QuickVK;
 
-Instance::Instance(const VulkanInitialisation& vkInitInfo)
+Instance::Instance(const QuickVKInitialisation& vkInitInfo)
 {
 	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = QuickVK::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);

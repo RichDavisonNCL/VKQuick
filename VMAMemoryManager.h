@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK
+This file is part of the QuickVK library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -9,26 +9,26 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 #include "MemoryManager.h"
 #include "Buffer.h"
-#include "VulkanTexture.h"
+#include "Texture.h"
 
 #include "vma/vk_mem_alloc.h"
 
 namespace QuickVK {
-	struct	VulkanInitialisation;
+	struct	QuickVKInitialisation;
 	class	VMABuffer;
 
 	class VMAMemoryManager : public MemoryManager {
 	public:
-		VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit);
+		VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const QuickVKInitialisation& vkInit);
 		virtual ~VMAMemoryManager();
 
-		VulkanBuffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags flags, const std::string& debugName = "")	override;
-		VulkanBuffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						override;
-		void			DiscardBuffer(VulkanBuffer& buffer, DiscardMode discard)								override;
+		Buffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags flags, const std::string& debugName = "")	override;
+		Buffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						override;
+		void			DiscardBuffer(Buffer& buffer, DiscardMode discard)								override;
 
-		void*			MapBuffer(const VulkanBuffer& buffer)			override;
-		void			UnmapBuffer(const VulkanBuffer& buffer)		override;
-		void			CopyData(const VulkanBuffer& buffer, void* data, size_t size, size_t offset = 0) override;
+		void*			MapBuffer(const Buffer& buffer)			override;
+		void			UnmapBuffer(const Buffer& buffer)		override;
+		void			CopyData(const Buffer& buffer, void* data, size_t size, size_t offset = 0) override;
 
 		vk::Image		CreateImage(vk::ImageCreateInfo createInfo, const std::string& debugName = "")		override;
 		void			DiscardImage(vk::Image& tex, DiscardMode discard)									override;
@@ -37,10 +37,10 @@ namespace QuickVK {
 
 	protected:
 		uint32_t	GetSpareBufferID();
-		void		DeleteBuffer(VulkanBuffer& buffer);
+		void		DeleteBuffer(Buffer& buffer);
 
 		struct DeferredBufferDeletion {
-			VulkanBuffer	buffer;
+			Buffer	buffer;
 			uint32_t		framesCount;
 		};
 
