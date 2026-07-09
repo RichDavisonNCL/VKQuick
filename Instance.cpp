@@ -11,7 +11,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "VulkanTextureBuilder.h"
 #include "VulkanDescriptorSetLayoutBuilder.h"
 
-#include "VulkanUtils.h"
+#include "Utils.h"
 
 //#ifdef _WIN32
 //#include "Win32Window.h"

@@ -5,10 +5,10 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanVMAMemoryManager.h"
+#include "VMAMemoryManager.h"
 #include "VulkanTexture.h"
 #include "Instance.h"
-#include "VulkanUtils.h"
+#include "Utils.h"
 
 using namespace QuickVK;
 

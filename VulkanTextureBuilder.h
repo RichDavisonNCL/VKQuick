@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "SmartTypes.h"
-#include "VulkanBuffer.h"
+#include "Buffer.h"
 #include "VulkanMemoryManager.h"
 
 namespace QuickVK {

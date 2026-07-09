@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Instance.h"
-#include "VulkanBuffer.h"
+#include "Buffer.h"
 #include "VulkanBVHBuilder.h"
 
 namespace QuickVK {

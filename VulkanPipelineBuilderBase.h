@@ -8,7 +8,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 #include "VulkanPipeline.h"
 #include "VulkanShaderModule.h"
-#include "VulkanUtils.h"
+#include "Utils.h"
 #include "SmartTypes.h"
 
 namespace QuickVK {

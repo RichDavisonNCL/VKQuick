@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanRayTracingPipelineBuilder.h"
 
-#include "VulkanUtils.h"
+#include "Utils.h"
 
 using namespace QuickVK;
 

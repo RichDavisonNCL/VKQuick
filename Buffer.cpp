@@ -5,7 +5,7 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanBuffer.h"
+#include "Buffer.h"
 #include "VulkanMemoryManager.h"
 
 using namespace QuickVK;

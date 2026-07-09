@@ -4,8 +4,8 @@ set(PROJECT_NAME QuickVK)
 # Source groups
 ################################################################################
 set(Header_Files
-    "VulkanUtils.h"
-    "VulkanBuffer.h"
+    "Utils.h"
+    "Buffer.h"
     "VulkanComputePipelineBuilder.h"
     "VulkanDescriptorSetLayoutBuilder.h"
     "VulkanDynamicRenderBuilder.h"
@@ -26,13 +26,13 @@ set(Header_Files
 	"VulkanRayTracingPipelineBuilder.h"	
 	"VulkanShaderBindingTableBuilder.h"
     "VulkanMemoryManager.h"
-    "VulkanVMAMemoryManager.h"
+    "VMAMemoryManager.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
-	"VulkanUtils.cpp"
-    "VulkanBuffer.cpp"
+	"Utils.cpp"
+    "Buffer.cpp"
     "VulkanComputePipelineBuilder.cpp"
     "VulkanDescriptorSetLayoutBuilder.cpp"
     "VulkanDynamicRenderBuilder.cpp"
@@ -46,7 +46,7 @@ set(Source_Files
 	"VulkanBVHBuilder.cpp"
 	"VulkanRayTracingPipelineBuilder.cpp"
 	"VulkanShaderBindingTableBuilder.cpp"	
-    "VulkanVMAMemoryManager.cpp"
+    "VMAMemoryManager.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
