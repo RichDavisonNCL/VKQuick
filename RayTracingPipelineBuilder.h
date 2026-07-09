@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Instance.h"
-#include "VulkanPipelineBuilderBase.h"
+#include "PipelineBuilderBase.h"
 
 namespace QuickVK {
 

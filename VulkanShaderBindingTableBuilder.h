@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include "Instance.h"
-#include "VulkanPipelineBuilderBase.h"
+#include "PipelineBuilderBase.h"
 
 
 namespace QuickVK {
@@ -37,7 +37,7 @@ namespace QuickVK {
 
 		VulkanShaderBindingTableBuilder& WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo);
 
-		ShaderBindingTable Build(vk::Device device, VulkanMemoryManager& memManager);
+		ShaderBindingTable Build(vk::Device device, MemoryManager& memManager);
 
 	protected:
 		void FillCounts(const vk::RayTracingPipelineCreateInfoKHR* fromInfo);

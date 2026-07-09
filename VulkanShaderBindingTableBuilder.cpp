@@ -62,7 +62,7 @@ int MakeMultipleOf(int input, int multiple) {
 	return count * multiple;
 }
 
-ShaderBindingTable VulkanShaderBindingTableBuilder::Build(vk::Device device, VulkanMemoryManager& memManager) {
+ShaderBindingTable VulkanShaderBindingTableBuilder::Build(vk::Device device, MemoryManager& memManager) {
 	assert(pipeCreateInfo);
 	assert(pipeline);
 

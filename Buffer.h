@@ -8,11 +8,11 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 
 namespace QuickVK {
-	class VulkanMemoryManager;
+	class MemoryManager;
 	//A buffer, backed by memory we have allocated elsewhere
 	class VulkanBuffer {
 	public:		
-		friend class VulkanMemoryManager;
+		friend class MemoryManager;
 		VulkanBuffer();
 		VulkanBuffer(VulkanBuffer&& obj);
 		virtual ~VulkanBuffer();
@@ -51,7 +51,7 @@ namespace QuickVK {
 			m_bufferID = id;
 		}
 
-		VulkanMemoryManager* m_sourceManager = nullptr;
+		MemoryManager* m_sourceManager = nullptr;
 
 		uint32_t m_bufferID;
 	};

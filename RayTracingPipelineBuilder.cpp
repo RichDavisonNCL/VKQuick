@@ -5,7 +5,7 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanRayTracingPipelineBuilder.h"
+#include "RayTracingPipelineBuilder.h"
 
 #include "Utils.h"
 

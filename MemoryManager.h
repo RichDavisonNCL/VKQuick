@@ -15,9 +15,9 @@ namespace QuickVK {
 		Deferred
 	};
 
-	class VulkanMemoryManager {
+	class MemoryManager {
 	public:
-		virtual ~VulkanMemoryManager() {};
+		virtual ~MemoryManager() {};
 
 		virtual VulkanBuffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memoryProperties, const std::string& debugName = "") = 0;
 

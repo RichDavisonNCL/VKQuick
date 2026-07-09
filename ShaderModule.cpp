@@ -5,7 +5,7 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanShaderModule.h"
+#include "ShaderModule.h"
 #include "Utils.h"
 
 extern "C" {

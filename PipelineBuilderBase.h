@@ -6,8 +6,8 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "VulkanPipeline.h"
-#include "VulkanShaderModule.h"
+#include "Pipeline.h"
+#include "ShaderModule.h"
 #include "Utils.h"
 #include "SmartTypes.h"
 

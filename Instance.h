@@ -6,10 +6,9 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-//#include "../NCLCoreClasses/RendererBase.h"
-//#include "../NCLCoreClasses/Maths.h"
-#include "VulkanMemoryManager.h"
-#include "VulkanPipeline.h"
+
+#include "MemoryManager.h"
+#include "Pipeline.h"
 #include "SmartTypes.h"
 #include "vma/vk_mem_alloc.h"
 using std::string;

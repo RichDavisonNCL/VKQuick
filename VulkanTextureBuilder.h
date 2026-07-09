@@ -8,14 +8,14 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 #include "SmartTypes.h"
 #include "Buffer.h"
-#include "VulkanMemoryManager.h"
+#include "MemoryManager.h"
 
 namespace QuickVK {
-	class VulkanMemoryManager;
+	class MemoryManager;
 
 	class TextureBuilder	{
 	public:
-		TextureBuilder(vk::Device device, VulkanMemoryManager& memManager);
+		TextureBuilder(vk::Device device, MemoryManager& memManager);
 		~TextureBuilder() = default;
 
 		TextureBuilder& WithFormat(vk::Format format);
@@ -81,7 +81,7 @@ namespace QuickVK {
 
 		vk::Device				m_sourceDevice;
 
-		VulkanMemoryManager*	m_memManager;
+		MemoryManager*	m_memManager;
 
 		vk::CommandBuffer		m_cmdBuffer;
 	};

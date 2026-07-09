@@ -12,7 +12,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 using namespace QuickVK;
 
-VulkanVMAMemoryManager::VulkanVMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit) {
+VMAMemoryManager::VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit) {
 	VmaVulkanFunctions funcs = {};
 	m_allocatorInfo = {};
 	funcs.vkGetInstanceProcAddr = ::vk::detail::defaultDispatchLoaderDynamic.vkGetInstanceProcAddr;
@@ -31,7 +31,7 @@ VulkanVMAMemoryManager::VulkanVMAMemoryManager(vk::Device device, vk::PhysicalDe
 	vmaCreateAllocator(&m_allocatorInfo, &m_memoryAllocator);
 }
 
-VulkanVMAMemoryManager::~VulkanVMAMemoryManager() {
+VMAMemoryManager::~VMAMemoryManager() {
 	for (std::vector<DeferredBufferDeletion>::iterator i = m_deferredDeleteBuffers.begin();
 		i != m_deferredDeleteBuffers.end(); ++i )
 	{
@@ -41,7 +41,7 @@ VulkanVMAMemoryManager::~VulkanVMAMemoryManager() {
 	vmaDestroyAllocator(m_memoryAllocator);
 }
 
-VulkanBuffer VulkanVMAMemoryManager::CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memProperties, const std::string& debugName) {
+VulkanBuffer VMAMemoryManager::CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memProperties, const std::string& debugName) {
 	VulkanBuffer newBuffer = AllocateBuffer();
 
 	uint32_t id = GetSpareBufferID();
@@ -95,7 +95,7 @@ VulkanBuffer VulkanVMAMemoryManager::CreateBuffer(vk::BufferCreateInfo createInf
 	return newBuffer;
 }
 
-VulkanBuffer VulkanVMAMemoryManager::CreateStagingBuffer(size_t size, const std::string& debugName) {
+VulkanBuffer VMAMemoryManager::CreateStagingBuffer(size_t size, const std::string& debugName) {
 	return CreateBuffer(
 		{
 			.size = size,
@@ -104,7 +104,7 @@ VulkanBuffer VulkanVMAMemoryManager::CreateStagingBuffer(size_t size, const std:
 		,vk::MemoryPropertyFlagBits::eHostVisible, debugName);
 }
 
-void VulkanVMAMemoryManager::DiscardBuffer(VulkanBuffer& buffer, DiscardMode discard) {
+void VMAMemoryManager::DiscardBuffer(VulkanBuffer& buffer, DiscardMode discard) {
 	if (discard == DiscardMode::Deferred) {
 		m_deferredDeleteBuffers.push_back({ std::move(buffer), m_framesInFlight });
 	}
@@ -113,7 +113,7 @@ void VulkanVMAMemoryManager::DiscardBuffer(VulkanBuffer& buffer, DiscardMode dis
 	}
 }
 
-vk::Image VulkanVMAMemoryManager::CreateImage(vk::ImageCreateInfo createInfo, const std::string& debugName) {
+vk::Image VMAMemoryManager::CreateImage(vk::ImageCreateInfo createInfo, const std::string& debugName) {
 	vk::Image	image;
 	Allocation	imageAlloc;
 
@@ -133,7 +133,7 @@ vk::Image VulkanVMAMemoryManager::CreateImage(vk::ImageCreateInfo createInfo, co
 	return image;
 }
 
-void VulkanVMAMemoryManager::DiscardImage(vk::Image& image, DiscardMode discard)	{
+void VMAMemoryManager::DiscardImage(vk::Image& image, DiscardMode discard)	{
 	auto it = m_imageAllocations.find(image);
 	if (it != m_imageAllocations.end()) {
 		vmaDestroyImage(m_memoryAllocator, image, it->second.m_allocationHandle);
@@ -141,7 +141,7 @@ void VulkanVMAMemoryManager::DiscardImage(vk::Image& image, DiscardMode discard)
 	}
 }
 
-void	VulkanVMAMemoryManager::Update() {
+void	VMAMemoryManager::Update() {
 	for (std::vector<DeferredBufferDeletion>::iterator i = m_deferredDeleteBuffers.begin();
 		i != m_deferredDeleteBuffers.end(); )
 	{
@@ -157,7 +157,7 @@ void	VulkanVMAMemoryManager::Update() {
 	}
 }
 
-void* VulkanVMAMemoryManager::MapBuffer(const VulkanBuffer& buffer) {
+void* VMAMemoryManager::MapBuffer(const VulkanBuffer& buffer) {
 	uint32_t id				= GetBufferID(buffer);
 	Allocation allocation	= m_bufferAllocations[id];
 
@@ -171,7 +171,7 @@ void* VulkanVMAMemoryManager::MapBuffer(const VulkanBuffer& buffer) {
 	return nullptr;
 }
 
-void	VulkanVMAMemoryManager::UnmapBuffer(const VulkanBuffer& buffer) {
+void	VMAMemoryManager::UnmapBuffer(const VulkanBuffer& buffer) {
 	uint32_t id = GetBufferID(buffer);
 	Allocation allocation = m_bufferAllocations[id];
 	if (allocation.m_allocationInfo.pMappedData) {
@@ -180,7 +180,7 @@ void	VulkanVMAMemoryManager::UnmapBuffer(const VulkanBuffer& buffer) {
 	vmaUnmapMemory(m_memoryAllocator, allocation.m_allocationHandle);
 }
 
-void	VulkanVMAMemoryManager::CopyData(const VulkanBuffer& buffer, void* data, size_t size, size_t offset) {
+void	VMAMemoryManager::CopyData(const VulkanBuffer& buffer, void* data, size_t size, size_t offset) {
 	uint32_t id = GetBufferID(buffer);
 	Allocation allocation = m_bufferAllocations[id];
 
@@ -197,7 +197,7 @@ void	VulkanVMAMemoryManager::CopyData(const VulkanBuffer& buffer, void* data, si
 	}
 }
 
-uint32_t	VulkanVMAMemoryManager::GetSpareBufferID() {
+uint32_t	VMAMemoryManager::GetSpareBufferID() {
 	uint32_t id = 0;
 	if (m_spareBufferIDs.empty()) {
 		id = m_bufferAllocations.size();
@@ -211,7 +211,7 @@ uint32_t	VulkanVMAMemoryManager::GetSpareBufferID() {
 	return id;
 }
 
-void	VulkanVMAMemoryManager::DeleteBuffer(VulkanBuffer& buffer) {
+void	VMAMemoryManager::DeleteBuffer(VulkanBuffer& buffer) {
 	uint32_t id				= GetBufferID(buffer);
 
 	if (!m_bufferAllocations[id].m_allocationHandle) {

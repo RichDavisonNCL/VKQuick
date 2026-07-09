@@ -6,9 +6,9 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "VulkanPipeline.h"
-#include "VulkanShaderModule.h"
-#include "VulkanPipelineBuilderBase.h"
+#include "Pipeline.h"
+#include "ShaderModule.h"
+#include "PipelineBuilderBase.h"
 #include "SmartTypes.h"
 
 namespace QuickVK {

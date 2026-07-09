@@ -5,7 +5,7 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "VulkanPipelineBuilder.h"
+#include "PipelineBuilder.h"
 #include "Utils.h"
 
 using namespace QuickVK;

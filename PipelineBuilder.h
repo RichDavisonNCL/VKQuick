@@ -6,14 +6,10 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "VulkanPipelineBuilderBase.h"
-#include "VulkanPipeline.h"
+#include "PipelineBuilderBase.h"
+#include "Pipeline.h"
 
 namespace QuickVK {
-	class VulkanRenderer;
-	class VulkanShader;
-	using UniqueVulkanShader = std::unique_ptr<VulkanShader>;
-
 	struct VulkanVertexSpecification;
 	/*
 	PipelineBuilder: Builder class for rasterisation pipelines. 

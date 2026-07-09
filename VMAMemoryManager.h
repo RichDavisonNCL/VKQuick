@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "VulkanMemoryManager.h"
+#include "MemoryManager.h"
 #include "Buffer.h"
 #include "VulkanTexture.h"
 
@@ -17,10 +17,10 @@ namespace QuickVK {
 	struct	VulkanInitialisation;
 	class	VMABuffer;
 
-	class VulkanVMAMemoryManager : public VulkanMemoryManager {
+	class VMAMemoryManager : public MemoryManager {
 	public:
-		VulkanVMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit);
-		virtual ~VulkanVMAMemoryManager();
+		VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit);
+		virtual ~VMAMemoryManager();
 
 		VulkanBuffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags flags, const std::string& debugName = "")	override;
 		VulkanBuffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						override;
