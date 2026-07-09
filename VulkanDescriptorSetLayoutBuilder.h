@@ -8,8 +8,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 
 namespace QuickVK {
-	class VulkanRenderer;
-
 	/*
 	DescriptorSetLayoutBuilder: This helper class can create new descriptor
 	set layouts, using a fluent interface.

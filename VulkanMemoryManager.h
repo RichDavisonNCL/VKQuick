@@ -49,7 +49,7 @@ namespace QuickVK {
 		}
 
 		uint32_t GetBufferID(const VulkanBuffer& b) const {
-			return b.m_BufferID;
+			return b.m_bufferID;
 		}
 
 		void	SetBufferID(VulkanBuffer& b, uint32_t id) {

@@ -6,7 +6,7 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "Buffer.h"
+
 namespace QuickVK {
 	class VulkanMemoryManager;
 	//A buffer, backed by memory we have allocated elsewhere
@@ -53,6 +53,6 @@ namespace QuickVK {
 
 		VulkanMemoryManager* m_sourceManager = nullptr;
 
-		uint32_t m_BufferID;
+		uint32_t m_bufferID;
 	};
 };

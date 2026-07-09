@@ -6,8 +6,8 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "../VulkanRendering/VulkanRenderer.h"
-#include "../VulkanRendering/VulkanPipelineBuilderBase.h"
+#include "Instance.h"
+#include "VulkanPipelineBuilderBase.h"
 
 
 namespace QuickVK {

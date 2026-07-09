@@ -8,8 +8,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "VulkanShaderBindingTableBuilder.h"
 #include "VulkanBuffer.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 VulkanShaderBindingTableBuilder::VulkanShaderBindingTableBuilder(const std::string& inDebugName) {

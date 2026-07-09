@@ -7,7 +7,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 namespace QuickVK {
-	class VulkanRenderer;
 	class VulkanTexture;
 	class RenderPassBuilder	{
 	public:

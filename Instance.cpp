@@ -5,27 +5,25 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
-#include "Vulkanrenderer.h"
-#include "VulkanMesh.h"
+#include "Instance.h"
+//#include "VulkanMesh.h"
 #include "VulkanTexture.h"
 #include "VulkanTextureBuilder.h"
 #include "VulkanDescriptorSetLayoutBuilder.h"
 
 #include "VulkanUtils.h"
 
-#ifdef _WIN32
-#include "Win32Window.h"
-using namespace NCL::Win32Code;
-#endif
-
-#define VMA_IMPLEMENTATION
-#include "vma/vk_mem_alloc.h"
-
-using namespace NCL;
-using namespace Rendering;
+//#ifdef _WIN32
+//#include "Win32Window.h"
+//using namespace NCL::Win32Code;
+//#endif
+//
+//#define VMA_IMPLEMENTATION
+//#include "vma/vk_mem_alloc.h"
+//
 using namespace QuickVK;
 
-VulkanRenderer::VulkanRenderer(Window& window, const VulkanInitialisation& vkInitInfo) : RendererBase(window)
+Instance::Instance(const VulkanInitialisation& vkInitInfo)
 {
 	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = QuickVK::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
@@ -45,7 +43,7 @@ VulkanRenderer::VulkanRenderer(Window& window, const VulkanInitialisation& vkIni
 	InitCommandPools();
 	InitDefaultDescriptorPool();
 
-	OnWindowResize(window.GetScreenSize().x, window.GetScreenSize().y);
+	//OnWindowResize(window.GetScreenSize().x, window.GetScreenSize().y);
 	InitFrameStates(m_vkInit.framesInFlight);
 
 	m_pipelineCache = m_device.createPipelineCache(vk::PipelineCacheCreateInfo());
@@ -53,7 +51,6 @@ VulkanRenderer::VulkanRenderer(Window& window, const VulkanInitialisation& vkIni
 	const FrameContext& context = GetFrameContext();
 
 	context.cmdBuffer.begin(vk::CommandBufferBeginInfo());
-
 
 	vk::SemaphoreTypeCreateInfo typeCreateInfo{
 		.semaphoreType = vk::SemaphoreType::eTimeline,
@@ -65,7 +62,7 @@ VulkanRenderer::VulkanRenderer(Window& window, const VulkanInitialisation& vkIni
 	m_flightSempaphore = m_device.createSemaphore(createInfo);
 }
 
-VulkanRenderer::~VulkanRenderer() {
+Instance::~Instance() {
 	m_device.waitIdle();
 
 	for(ChainState & c : m_swapStates) {
@@ -104,9 +101,9 @@ VulkanRenderer::~VulkanRenderer() {
 	m_instance.destroy();
 }
 
-bool VulkanRenderer::InitInstance() {
+bool Instance::InitInstance() {
 	vk::ApplicationInfo appInfo{
-		.pApplicationName	= hostWindow.GetTitle().c_str(),
+		.pApplicationName	= m_vkInit.applicationName.c_str(),
 		.apiVersion			= VK_MAKE_VERSION(m_vkInit.majorVersion, m_vkInit.minorVersion, 0)
 	};
 		
@@ -126,7 +123,7 @@ bool VulkanRenderer::InitInstance() {
 	return true;
 }
 
-bool	VulkanRenderer::InitPhysicalDevice() {
+bool	Instance::InitPhysicalDevice() {
 	auto enumResult = m_instance.enumeratePhysicalDevices();
 
 	if (enumResult.empty()) {
@@ -146,7 +143,7 @@ bool	VulkanRenderer::InitPhysicalDevice() {
 	return true;
 }
 
-bool VulkanRenderer::InitGPUDevice() {
+bool Instance::InitGPUDevice() {
 	InitSurface();
 	InitDeviceQueueIndices();
 
@@ -233,18 +230,18 @@ bool VulkanRenderer::InitGPUDevice() {
 	return true;
 }
 
-bool VulkanRenderer::InitSurface() {
-#ifdef _WIN32
-	Win32Window* window = (Win32Window*)&hostWindow;
-
-	m_surface = m_instance.createWin32SurfaceKHR(
-		{
-			.flags = {},
-			.hinstance = window->GetInstance(),
-			.hwnd = window->GetHandle()
-		}
-	);
-#endif
+bool Instance::InitSurface() {
+//#ifdef _WIN32
+//	Win32Window* window = (Win32Window*)&hostWindow;
+//
+//	m_surface = m_instance.createWin32SurfaceKHR(
+//		{
+//			.flags = {},
+//			.hinstance = window->GetInstance(),
+//			.hwnd = window->GetHandle()
+//		}
+//	);
+//#endif
 
 	auto formats = m_physicalDevice.getSurfaceFormatsKHR(m_surface);
 	if (formats.empty()) {
@@ -268,7 +265,7 @@ bool VulkanRenderer::InitSurface() {
 	return true;
 }
 
-void	VulkanRenderer::InitFrameStates(uint32_t m_framesInFlight) {
+void	Instance::InitFrameStates(uint32_t m_framesInFlight) {
 	m_frameContexts.resize(m_framesInFlight);
 	m_acquireStates.resize(m_framesInFlight);
 	auto buffers = m_device.allocateCommandBuffers(
@@ -312,12 +309,12 @@ void	VulkanRenderer::InitFrameStates(uint32_t m_framesInFlight) {
 	}
 }
 
-void VulkanRenderer::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
+void Instance::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 	vk::SwapchainKHR oldChain					= m_swapChain;
 
 	vk::SurfaceCapabilitiesKHR surfaceCaps = m_physicalDevice.getSurfaceCapabilitiesKHR(m_surface);
 
-	vk::Extent2D swapExtents = vk::Extent2D((int)hostWindow.GetScreenSize().x, (int)hostWindow.GetScreenSize().y);
+	vk::Extent2D swapExtents;// = vk::Extent2D((int)hostWindow.GetScreenSize().x, (int)hostWindow.GetScreenSize().y);
 
 	auto presentModes = m_physicalDevice.getSurfacePresentModesKHR(m_surface); //Type is of vector of PresentModeKHR
 
@@ -400,8 +397,8 @@ void VulkanRenderer::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 			};
 
 			vk::FramebufferCreateInfo createInfo = vk::FramebufferCreateInfo()
-				.setWidth(hostWindow.GetScreenSize().x)
-				.setHeight(hostWindow.GetScreenSize().y)
+				//.setWidth(hostWindow.GetScreenSize().x)
+				//.setHeight(hostWindow.GetScreenSize().y)
 				.setLayers(1)
 				.setAttachmentCount(std::size(attachments))
 				.setPAttachments(attachments)
@@ -414,7 +411,7 @@ void VulkanRenderer::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 	m_currentSwapState	= &m_swapStates.back();
 }
 
-void	VulkanRenderer::InitCommandPools() {	
+void	Instance::InitCommandPools() {
 	for (uint32_t i = 0; i < CommandType::MAX_COMMAND_TYPES; ++i) {
 		m_commandPools[i] = m_device.createCommandPool(
 			{
@@ -429,7 +426,7 @@ void	VulkanRenderer::InitCommandPools() {
 	QuickVK::SetDebugName(m_device, m_commandPools[CommandType::Present], "Present Command Pool");
 }
 
-bool VulkanRenderer::InitDeviceQueueIndices() {
+bool Instance::InitDeviceQueueIndices() {
 	std::vector<vk::QueueFamilyProperties> deviceQueueProps = m_physicalDevice.getQueueFamilyProperties();
 
 	VkBool32 supportsPresent = false;
@@ -489,27 +486,33 @@ bool VulkanRenderer::InitDeviceQueueIndices() {
 	return true;
 }
 
-bool VulkanRenderer::SupportsAsyncCompute() const {
+bool Instance::SupportsAsyncCompute() const {
 	return m_queueFamilies[CommandType::AsyncCompute] != m_queueFamilies[CommandType::Graphics];
 }
 
-bool VulkanRenderer::SupportsAsyncCopy()	const {
+bool Instance::SupportsAsyncCopy()	const {
 	return m_queueFamilies[CommandType::Copy] != m_queueFamilies[CommandType::Graphics];
 }
 
-bool VulkanRenderer::SupportsAsyncPresent() const {
+bool Instance::SupportsAsyncPresent() const {
 	return m_queueFamilies[CommandType::Present] != m_queueFamilies[CommandType::Graphics];
 }
 
-void VulkanRenderer::OnWindowResize(int width, int height) {
-	if (width == windowSize.x && height == windowSize.y) {
-		m_device.waitIdle();
-		return;
-	}
+void Instance::OnWindowResize(int width, int height) {
+	//if (width == windowSize.x && height == windowSize.y) {
+	//	m_device.waitIdle();
+	//	return;
+	//}
+	struct Temp {
+		float x;
+		float y;
+	};
+	Temp windowSize;
+
 	if (width == 0 && height == 0) {
 		return;
 	}
-	windowSize = { width, height };
+	//windowSize = { width, height };
 
 	m_defaultScreenRect = {
 		.offset = {0,0},
@@ -532,7 +535,7 @@ void VulkanRenderer::OnWindowResize(int width, int height) {
 
 	m_device.waitIdle();
 	
-	CreateDepthBufer(hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y);
+	//CreateDepthBufer(hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y);
 	
 	InitDefaultRenderPass();
 
@@ -555,11 +558,11 @@ void VulkanRenderer::OnWindowResize(int width, int height) {
 	m_device.waitIdle();
 }
 
-void VulkanRenderer::CompleteResize() {
+void Instance::CompleteResize() {
 
 }
 
-void	VulkanRenderer::BeginFrame() {
+void	Instance::BeginFrame() {
 	const FrameContext& context = GetFrameContext();
 
 	//Clear out any commands from the constructor
@@ -617,32 +620,28 @@ void	VulkanRenderer::BeginFrame() {
 	context.cmdBuffer.setScissor(0, 1, &m_defaultScissor);
 }
 
-void VulkanRenderer::RenderFrame() {
-
-}
-
-void	VulkanRenderer::EndFrame() {
+void	Instance::EndFrame() {
 	const FrameContext& context = GetFrameContext();
 
 	TransitionColourToPresent(context.cmdBuffer, m_currentFrameContext->colourImage);
-	if (hostWindow.IsMinimised()) {
-		QuickVK::CmdBufferSubmit(
-			{
-				.buffer = context.cmdBuffer,
-				.queue	= m_queues[CommandType::Graphics],
-				.device = m_device,
-				.wait	= true
-			}
-		);
-	}
-	else {
-		QuickVK::CmdBufferSubmit(
-			{
-				.buffer = context.cmdBuffer,
-				.queue = context.queues[CommandType::Graphics],
-			}
-		);
-	}
+	//if (hostWindow.IsMinimised()) {
+	//	QuickVK::CmdBufferSubmit(
+	//		{
+	//			.buffer = context.cmdBuffer,
+	//			.queue	= m_queues[CommandType::Graphics],
+	//			.device = m_device,
+	//			.wait	= true
+	//		}
+	//	);
+	//}
+	//else {
+	//	QuickVK::CmdBufferSubmit(
+	//		{
+	//			.buffer = context.cmdBuffer,
+	//			.queue = context.queues[CommandType::Graphics],
+	//		}
+	//	);
+	//}
 
 	const uint64_t nextWaitID = m_globalFrameID + m_frameContexts.size();
 	
@@ -680,22 +679,22 @@ void	VulkanRenderer::EndFrame() {
 	m_globalFrameID++;
 }
 
-void VulkanRenderer::SwapBuffers() {
-	if (!hostWindow.IsMinimised()) {
-		vk::Queue	gfxQueue		= m_queues[CommandType::Graphics];
-		vk::Result	presentResult = gfxQueue.presentKHR(
-			{
-				.waitSemaphoreCount = 1,
-				.pWaitSemaphores	= &m_currentSwapState->presentSempaphore,
-				.swapchainCount		= 1,
-				.pSwapchains		= &m_swapChain,
-				.pImageIndices		= &m_currentSwap,
-			}
-		);	
-	}
+void Instance::SwapBuffers() {
+	//if (!hostWindow.IsMinimised()) {
+	//	vk::Queue	gfxQueue		= m_queues[CommandType::Graphics];
+	//	vk::Result	presentResult = gfxQueue.presentKHR(
+	//		{
+	//			.waitSemaphoreCount = 1,
+	//			.pWaitSemaphores	= &m_currentSwapState->presentSempaphore,
+	//			.swapchainCount		= 1,
+	//			.pSwapchains		= &m_swapChain,
+	//			.pImageIndices		= &m_currentSwap,
+	//		}
+	//	);	
+	//}
 }
 
-void	VulkanRenderer::InitDefaultRenderPass() {
+void	Instance::InitDefaultRenderPass() {
 	if (m_defaultRenderPass) {
 		m_device.destroyRenderPass(m_defaultRenderPass);
 	}
@@ -737,7 +736,7 @@ void	VulkanRenderer::InitDefaultRenderPass() {
 	m_defaultRenderPass = m_device.createRenderPass(renderPassInfo);
 }
 
-void	VulkanRenderer::InitDefaultDescriptorPool() {
+void	Instance::InitDefaultDescriptorPool() {
 	std::vector< vk::DescriptorPoolSize> poolSizes;
 
 	if (m_vkInit.defaultDescriptorPoolBufferCount > 0) {
@@ -774,11 +773,11 @@ void	VulkanRenderer::InitDefaultDescriptorPool() {
 	m_defaultDescriptorPool = m_device.createDescriptorPool(poolCreate);
 }
 
-void	VulkanRenderer::BeginDefaultRenderPass(vk::CommandBuffer  cmds) {
+void	Instance::BeginDefaultRenderPass(vk::CommandBuffer  cmds) {
 	cmds.beginRenderPass(m_defaultBeginInfo, vk::SubpassContents::eInline);
 }
 
-void	VulkanRenderer::BeginRenderToScreen(vk::CommandBuffer  cmds) {
+void	Instance::BeginRenderToScreen(vk::CommandBuffer  cmds) {
 	vk::Result waitResult = m_device.waitForFences(m_currentAcquireState->acquireFence, true, ~0);
 	TransitionUndefinedToColour(cmds, m_currentFrameContext->colourImage);
 
@@ -811,7 +810,7 @@ void	VulkanRenderer::BeginRenderToScreen(vk::CommandBuffer  cmds) {
 	cmds.setScissor( 0, 1, &m_defaultScissor);
 }
 
-VkBool32 VulkanRenderer::DebugCallbackFunction(
+VkBool32 Instance::DebugCallbackFunction(
 	vk::DebugUtilsMessageSeverityFlagBitsEXT			messageSeverity,
 	vk::DebugUtilsMessageTypeFlagsEXT					messageTypes,
 	const vk::DebugUtilsMessengerCallbackDataEXT*		pCallbackData,
@@ -820,7 +819,7 @@ VkBool32 VulkanRenderer::DebugCallbackFunction(
 	return false;
 }
 
-bool	VulkanRenderer::MemoryTypeFromPhysicalDeviceProps(vk::MemoryPropertyFlags requirements, uint32_t type, uint32_t& index) {
+bool	Instance::MemoryTypeFromPhysicalDeviceProps(vk::MemoryPropertyFlags requirements, uint32_t type, uint32_t& index) {
 	for (uint32_t i = 0; i < 32; ++i) {
 		if ((type & 1) == 1) {	//We care about this requirement
 			if ((m_physicalDevice.getMemoryProperties().memoryTypes[i].propertyFlags & requirements) == requirements) {
@@ -833,7 +832,7 @@ bool	VulkanRenderer::MemoryTypeFromPhysicalDeviceProps(vk::MemoryPropertyFlags r
 	return false;
 }
 
-void	VulkanRenderer::CreateDepthBufer(uint32_t width, uint32_t height) {
+void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 	m_device.destroyImageView(m_depthView);
 	m_device.destroyImage(m_depthImage);
 	m_device.freeMemory(m_depthMemory);

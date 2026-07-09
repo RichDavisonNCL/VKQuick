@@ -8,8 +8,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "VulkanComputePipelineBuilder.h"
 #include "VulkanUtils.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 ComputePipelineBuilder::ComputePipelineBuilder(vk::Device device) : PipelineBuilderBase(device){

@@ -7,8 +7,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanDynamicRenderBuilder.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 DynamicRenderBuilder::DynamicRenderBuilder() {

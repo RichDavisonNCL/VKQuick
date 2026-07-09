@@ -6,11 +6,8 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanPipelineBuilder.h"
-#include "VulkanMesh.h"
 #include "VulkanUtils.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 PipelineBuilder::PipelineBuilder(vk::Device device) : PipelineBuilderBase(device)	{

@@ -7,11 +7,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanVMAMemoryManager.h"
 #include "VulkanTexture.h"
-#include "Vulkanrenderer.h"
+#include "Instance.h"
 #include "VulkanUtils.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 VulkanVMAMemoryManager::VulkanVMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VulkanInitialisation& vkInit) {

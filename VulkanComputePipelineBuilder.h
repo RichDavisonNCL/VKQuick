@@ -12,7 +12,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "SmartTypes.h"
 
 namespace QuickVK {
-	class VulkanCompute;
 	/*
 	ComputePipelineBuilder: A Builder class to automate the creation of 
 	compute pipelines, including the correct push constants and descriptor

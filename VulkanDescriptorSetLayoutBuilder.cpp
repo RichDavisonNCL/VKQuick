@@ -6,12 +6,9 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanDescriptorSetLayoutBuilder.h"
-#include "VulkanMesh.h"
-#include "Vulkanrenderer.h"
+#include "Instance.h"
 #include "VulkanUtils.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::WithDescriptor(vk::DescriptorSetLayoutBinding binding, vk::DescriptorBindingFlags bindingFlags) {

@@ -12,9 +12,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "SmartTypes.h"
 
 namespace QuickVK {
-	class VulkanRenderer;
-	class VulkanShader;
-
 	struct VulkanVertexSpecification;
 
 	template <class T, class P>

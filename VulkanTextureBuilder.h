@@ -65,7 +65,7 @@ namespace QuickVK {
 
 		void FinaliseTexture(const std::string& debugName, vk::CommandBuffer& usingBuffer, TextureJob& job, UniqueVulkanTexture& t);
 
-		UniqueVulkanTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, Maths::Vector3ui dimensions, bool isCube, const std::string& debugName);
+		UniqueVulkanTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, vk::Extent2D dimensions, bool isCube, const std::string& debugName);
 
 		void UploadTextureData(vk::CommandBuffer buffer, TextureJob& job);
 

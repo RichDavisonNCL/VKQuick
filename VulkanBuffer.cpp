@@ -8,10 +8,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "VulkanBuffer.h"
 #include "VulkanMemoryManager.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
-
 
 VulkanBuffer::VulkanBuffer() {
 	buffer = nullptr;
@@ -19,7 +16,7 @@ VulkanBuffer::VulkanBuffer() {
 	deviceAddress = 0;
 }
 
-VulkanBuffer::VulkanBuffer(VulkanBuffer&& obj) : Buffer(std::move(obj)) {
+VulkanBuffer::VulkanBuffer(VulkanBuffer&& obj)  {
 	buffer			= obj.buffer;
 	deviceAddress	= obj.deviceAddress;
 	size			= obj.size;
@@ -27,7 +24,7 @@ VulkanBuffer::VulkanBuffer(VulkanBuffer&& obj) : Buffer(std::move(obj)) {
 	m_bufferID		= obj.m_bufferID;
 
 	obj.buffer		= VK_NULL_HANDLE;
-	obj.bufferID	= -1;
+	obj.m_bufferID	= -1;
 	obj.m_sourceManager = nullptr;
 	obj.size		= 0;
 }
@@ -38,10 +35,10 @@ VulkanBuffer& VulkanBuffer::operator=(VulkanBuffer&& obj) {
 		deviceAddress	= obj.deviceAddress;
 		size			= obj.size;
 		m_sourceManager	= obj.m_sourceManager;
-		assetID			= obj.assetID;
+		m_bufferID		= obj.m_bufferID;
 
 		obj.buffer		= VK_NULL_HANDLE;
-		obj.bufferID	= -1;
+		obj.m_bufferID	= -1;
 		obj.m_sourceManager = nullptr;
 		obj.size		= 0;
 	}

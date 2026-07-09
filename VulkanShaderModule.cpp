@@ -6,7 +6,6 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanShaderModule.h"
-#include "Assets.h"
 #include "VulkanUtils.h"
 
 extern "C" {
@@ -15,14 +14,12 @@ extern "C" {
 
 using std::ifstream;
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 VulkanShaderModule::VulkanShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
 	char* data;
 	size_t dataSize = 0;
-	Assets::ReadBinaryFile(Assets::SHADERDIR + "VK/" + filename, &data, dataSize);
+	//Assets::ReadBinaryFile(Assets::SHADERDIR + "VK/" + filename, &data, dataSize);
 
 	if (dataSize > 0) {
 		m_shaderModule = device.createShaderModuleUnique(

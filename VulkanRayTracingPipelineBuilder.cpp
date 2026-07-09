@@ -7,11 +7,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "VulkanRayTracingPipelineBuilder.h"
 
-#include "VulkanMesh.h"
 #include "VulkanUtils.h"
 
-using namespace NCL;
-using namespace Rendering;
 using namespace QuickVK;
 
 VulkanRayTracingPipelineBuilder::VulkanRayTracingPipelineBuilder(vk::Device device) : PipelineBuilderBase(device){

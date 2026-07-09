@@ -6,8 +6,8 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "../NCLCoreClasses/RendererBase.h"
-#include "../NCLCoreClasses/Maths.h"
+//#include "../NCLCoreClasses/RendererBase.h"
+//#include "../NCLCoreClasses/Maths.h"
 #include "VulkanMemoryManager.h"
 #include "VulkanPipeline.h"
 #include "SmartTypes.h"
@@ -86,10 +86,11 @@ namespace QuickVK {
 
 		uint32_t	framesInFlight	= 3;
 
-		//bool		autoBeginDynamicRendering	= true;
 		bool		useOpenGLCoordinates		= false;
 
 		bool		useHDRSurface				= false;
+
+		std::string applicationName = "QuickVK Application";
 
 		std::vector<void*>			features;
 
@@ -100,12 +101,12 @@ namespace QuickVK {
 		std::vector<const char*>	deviceLayers;
 	};
 
-	class VulkanRenderer : public RendererBase {
+	class Instance {
 		friend class VulkanMesh;
 		friend class VulkanTexture;
 	public:
-		VulkanRenderer(Window& window, const VulkanInitialisation& vkInit);
-		~VulkanRenderer();
+		Instance(const VulkanInitialisation& vkInit);
+		~Instance();
 
 		virtual bool HasInitialised() const { return m_device; }
 
@@ -134,12 +135,11 @@ namespace QuickVK {
 		void	BeginDefaultRenderPass(vk::CommandBuffer cmds);
 		void	BeginRenderToScreen(vk::CommandBuffer  cmds);
 
-		void BeginFrame()		override;
-		void RenderFrame()		override;
-		void EndFrame()			override;
-		void SwapBuffers()		override;
+		void BeginFrame();
+		void EndFrame();
+		void SwapBuffers();
 
-		void OnWindowResize(int w, int h)	override;
+		void OnWindowResize(int w, int h);
 	protected:
 		virtual void	CompleteResize();
 		virtual void	InitDefaultRenderPass();

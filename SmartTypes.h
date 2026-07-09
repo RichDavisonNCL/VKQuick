@@ -9,8 +9,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 namespace QuickVK {
 	class VulkanMesh;
-	class VulkanShader;
-	class VulkanCompute;
+	//class VulkanShader;
 	class VulkanTexture;
 	class VulkanBuffer;
 	class VulkanShaderModule;
@@ -18,11 +17,8 @@ namespace QuickVK {
 	using UniqueVulkanMesh		= std::unique_ptr<VulkanMesh>;
 	using SharedVulkanMesh		= std::shared_ptr<VulkanMesh>;
 
-	using UniqueVulkanShader	= std::unique_ptr<VulkanShader>;
-	using SharedVulkanShader	= std::shared_ptr<VulkanShader>;
-
-	using UniqueVulkanCompute	= std::unique_ptr<VulkanCompute>;
-	using SharedVulkanCompute	= std::shared_ptr<VulkanCompute>;
+	//using UniqueVulkanShader	= std::unique_ptr<VulkanShader>;
+	//using SharedVulkanShader	= std::shared_ptr<VulkanShader>;
 
 	using UniqueVulkanTexture	= std::unique_ptr<VulkanTexture>;
 	using SharedVulkanTexture	= std::shared_ptr<VulkanTexture>;
