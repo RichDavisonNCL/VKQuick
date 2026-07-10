@@ -15,7 +15,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 namespace QuickVK {
 	struct	QuickVKInitialisation;
-	class	VMABuffer;
 
 	class VMAMemoryManager : public MemoryManager {
 	public:

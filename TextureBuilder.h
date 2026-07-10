@@ -51,12 +51,12 @@ namespace QuickVK {
 
 	protected:
 		struct TextureJob {
-			vk::Image		image;
-			vk::ImageLayout endLayout;
-			vk::ImageAspectFlags aspect;
-			size_t			faceByteCount = 0;
+			vk::Image				image;
+			vk::ImageLayout			endLayout;
+			vk::ImageAspectFlags	aspect;
+			size_t					faceByteCount = 0;
 
-			NCL::Maths::Vector3ui		dimensions;
+			vk::Extent3D			dimensions;
 
 			uint32_t faceCount		= 0;
 
@@ -65,11 +65,11 @@ namespace QuickVK {
 
 		void FinaliseTexture(const std::string& debugName, vk::CommandBuffer& usingBuffer, TextureJob& job, UniqueTexture& t);
 
-		UniqueTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, vk::Extent2D dimensions, bool isCube, const std::string& debugName);
+		UniqueTexture	GenerateTexture(vk::CommandBuffer m_cmdBuffer, vk::Extent3D dimensions, bool isCube, const std::string& debugName);
 
 		void UploadTextureData(vk::CommandBuffer buffer, TextureJob& job);
 
-		NCL::Maths::Vector3ui	m_requestedSize;
+		vk::Extent3D			m_requestedSize;
 		uint32_t				m_layerCount;
 		bool					m_generateMips;
 
