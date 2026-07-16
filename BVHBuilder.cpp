@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -9,7 +9,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 //#include "VulkanMesh.h"
 #include "Utils.h"
 
-using namespace QuickVK;
+using namespace VKQuick;
 
 //VulkanBVHBuilder::VulkanBVHBuilder() {
 //
@@ -197,7 +197,7 @@ using namespace QuickVK;
 //			{} //imageMemoryBarriers
 //		);
 //	}
-//	QuickVK::CmdBufferSubmit(
+//	VKQuick::CmdBufferSubmit(
 //		{
 //			.buffer = *buffer,
 //			.queue = m_queue,
@@ -316,7 +316,7 @@ using namespace QuickVK;
 //
 //	vk::UniqueCommandBuffer cmdBuffer = CmdBufferCreateBegin(m_device, m_pool, "Making TLAS");
 //	cmdBuffer->buildAccelerationStructuresKHR(1, &geomInfo, &rangeInfoPtr);
-//	QuickVK::CmdBufferSubmit(
+//	VKQuick::CmdBufferSubmit(
 //		{
 //			.buffer = *cmdBuffer,
 //			.queue = m_queue,

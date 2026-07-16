@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -9,8 +9,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "SmartTypes.h"
 #include "Buffer.h"
 #include "MemoryManager.h"
+#include "Texture.h"
 
-namespace QuickVK {
+namespace VKQuick {
 	class MemoryManager;
 
 	class TextureBuilder	{
@@ -31,9 +32,9 @@ namespace QuickVK {
 		TextureBuilder& WithLayerCount(uint32_t layers);
 
 		//Builds an empty texture
-		UniqueTexture Build(const std::string& debugName = "");
+		UniqueTexture BuildEmpty(const std::string& debugName = "");
 
-		//Builds a specifically sized texture using provided data is input
+		//Builds a specifically sized texture using provided data as input
 		UniqueTexture BuildFromData(void* dataSrc, size_t byteCount, const std::string& debugName = "");
 
 		//Builds a texture loaded from file
@@ -48,6 +49,9 @@ namespace QuickVK {
 			const std::string& negativeYFile, const std::string& positiveYFile,
 			const std::string& negativeZFile, const std::string& positiveZFile,	
 			const std::string& debugName = "");
+
+
+		static void SetFileHandlingFunctions(TextureLoadFunction loadFunc, TextureLoadReleaseFunction releaseFunc);
 
 	protected:
 		struct TextureJob {
@@ -81,8 +85,11 @@ namespace QuickVK {
 
 		vk::Device				m_sourceDevice;
 
-		MemoryManager*	m_memManager;
+		MemoryManager*			m_memManager;
 
 		vk::CommandBuffer		m_cmdBuffer;
+
+		static TextureLoadFunction			s_loadFunction;
+		static TextureLoadReleaseFunction	s_releaseFunction;
 	};
 }

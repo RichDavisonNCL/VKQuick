@@ -1,12 +1,12 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-namespace QuickVK {
+namespace VKQuick {
 	/*
 	DescriptorSetBinder: This helper class allows us to quickly bind multiple 
 	descriptor sets to the same pipeline. Each set is bound using the command

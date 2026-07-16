@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -14,7 +14,7 @@ extern "C" {
 
 using std::ifstream;
 
-using namespace QuickVK;
+using namespace VKQuick;
 
 ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
 	char* data;
@@ -31,7 +31,7 @@ ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits 
 		);
 		AddReflectionData(dataSize, data, stage);
 
-		QuickVK::SetDebugName(device, *m_shaderModule, filename);
+		VKQuick::SetDebugName(device, *m_shaderModule, filename);
 	}
 	else {
 		std::cout << __FUNCTION__ << ": Problem loading shader file " << filename << "!\n";

@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -11,7 +11,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Utils.h"
 #include "SmartTypes.h"
 
-namespace QuickVK {
+namespace VKQuick {
 	struct VulkanVertexSpecification;
 
 	template <class T, class P>

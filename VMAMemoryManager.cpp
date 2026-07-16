@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -10,9 +10,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Instance.h"
 #include "Utils.h"
 
-using namespace QuickVK;
+using namespace VKQuick;
 
-VMAMemoryManager::VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const QuickVKInitialisation& vkInit) {
+VMAMemoryManager::VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VKQuickInitialisation& vkInit) {
 	VmaVulkanFunctions funcs = {};
 	m_allocatorInfo = {};
 	funcs.vkGetInstanceProcAddr = ::vk::detail::defaultDispatchLoaderDynamic.vkGetInstanceProcAddr;

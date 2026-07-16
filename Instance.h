@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -13,7 +13,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "vma/vk_mem_alloc.h"
 using std::string;
 
-namespace QuickVK {
+namespace VKQuick {
 	namespace CommandType {
 		enum Type : uint32_t {
 			Graphics,
@@ -64,7 +64,7 @@ namespace QuickVK {
 		vk::Fence			presentFence;
 	};
 
-	struct QuickVKInitialisation {
+	struct VKQuickInitialisation {
 		vk::Format			depthStencilFormat	= vk::Format::eD32SfloatS8Uint;
 		vk::PresentModeKHR  idealPresentMode	= vk::PresentModeKHR::eFifo;
 
@@ -89,7 +89,7 @@ namespace QuickVK {
 
 		bool		useHDRSurface				= false;
 
-		std::string applicationName = "QuickVK Application";
+		std::string applicationName = "VKQuick Application";
 
 		std::vector<void*>			features;
 
@@ -102,7 +102,7 @@ namespace QuickVK {
 
 	class Instance {
 	public:
-		Instance(const QuickVKInitialisation& vkInit);
+		Instance(const VKQuickInitialisation& vkInit);
 		~Instance();
 
 		virtual bool HasInitialised() const { return m_device; }
@@ -162,7 +162,7 @@ namespace QuickVK {
 
 		bool	InitDeviceQueueIndices();
 	private:
-		QuickVKInitialisation		m_vkInit;
+		VKQuickInitialisation		m_vkInit;
 
 		vk::Instance				m_instance;			//API Instance
 		vk::PhysicalDevice			m_physicalDevice;	//GPU in use

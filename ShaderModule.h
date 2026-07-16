@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -8,7 +8,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 #include "../NCLCoreClasses/Shader.h"
 
-namespace QuickVK {
+namespace VKQuick {
 	class ShaderModule  {
 	public:
 		ShaderModule(const std::string& filename,  vk::ShaderStageFlagBits moduleStage, vk::Device device);

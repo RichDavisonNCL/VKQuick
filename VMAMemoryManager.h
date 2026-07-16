@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -13,12 +13,12 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 #include "vma/vk_mem_alloc.h"
 
-namespace QuickVK {
-	struct	QuickVKInitialisation;
+namespace VKQuick {
+	struct	VKQuickInitialisation;
 
 	class VMAMemoryManager : public MemoryManager {
 	public:
-		VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const QuickVKInitialisation& vkInit);
+		VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VKQuickInitialisation& vkInit);
 		virtual ~VMAMemoryManager();
 
 		Buffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags flags, const std::string& debugName = "")	override;

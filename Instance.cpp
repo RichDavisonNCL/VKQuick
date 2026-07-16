@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -21,11 +21,11 @@ License: MIT (see LICENSE file at the top of the source tree)
 //#define VMA_IMPLEMENTATION
 //#include "vma/vk_mem_alloc.h"
 //
-using namespace QuickVK;
+using namespace VKQuick;
 
-Instance::Instance(const QuickVKInitialisation& vkInitInfo)
+Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 {
-	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = QuickVK::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
+	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = VKQuick::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
 
 	m_vkInit = vkInitInfo;
@@ -202,24 +202,24 @@ bool Instance::InitGPUDevice() {
 	createInfo.pNext = &deviceFeatures;
 
 	m_device = m_physicalDevice.createDevice(createInfo);
-	QuickVK::SetDebugName(m_device, m_device, "GPU Device");
-	QuickVK::SetDebugName(m_device, m_physicalDevice, "Physical Device");
+	VKQuick::SetDebugName(m_device, m_device, "GPU Device");
+	VKQuick::SetDebugName(m_device, m_physicalDevice, "Physical Device");
 
 	m_queues[CommandType::Graphics]		= m_device.getQueue(m_queueFamilies[CommandType::Type::Graphics], 0);
 	m_queues[CommandType::AsyncCompute]	= m_device.getQueue(m_queueFamilies[CommandType::Type::AsyncCompute], 0);
 	m_queues[CommandType::Copy]			= m_device.getQueue(m_queueFamilies[CommandType::Type::Copy], 0);
 	m_queues[CommandType::Present]		= m_device.getQueue(m_queueFamilies[CommandType::Type::Present], 0);
 
-	QuickVK::SetDebugName(m_device, m_queues[CommandType::Graphics], "Graphics Queue");
+	VKQuick::SetDebugName(m_device, m_queues[CommandType::Graphics], "Graphics Queue");
 
 	if (m_queues[CommandType::AsyncCompute] != m_queues[CommandType::Graphics]) {
-		QuickVK::SetDebugName(m_device, m_queues[CommandType::AsyncCompute], "Compute Queue");
+		VKQuick::SetDebugName(m_device, m_queues[CommandType::AsyncCompute], "Compute Queue");
 	}
 	if (m_queues[CommandType::Copy] != m_queues[CommandType::Graphics]) {
-		QuickVK::SetDebugName(m_device, m_queues[CommandType::Copy], "Copy Queue");
+		VKQuick::SetDebugName(m_device, m_queues[CommandType::Copy], "Copy Queue");
 	}
 	if (m_queues[CommandType::Present] != m_queues[CommandType::Graphics]) {
-		QuickVK::SetDebugName(m_device, m_queues[CommandType::Present], "Present Queue");
+		VKQuick::SetDebugName(m_device, m_queues[CommandType::Present], "Present Queue");
 	}
 
 	m_deviceMemoryProperties	= m_physicalDevice.getMemoryProperties();
@@ -283,7 +283,7 @@ void	Instance::InitFrameStates(uint32_t m_framesInFlight) {
 
 		context.cmdBuffer			= buffers[index];
 
-		QuickVK::SetDebugName(m_device, context.cmdBuffer, "Context Cmds " + std::to_string(index));
+		VKQuick::SetDebugName(m_device, context.cmdBuffer, "Context Cmds " + std::to_string(index));
 
 		context.viewport			= m_defaultViewport;
 		context.screenRect			= m_defaultScreenRect;
@@ -420,10 +420,10 @@ void	Instance::InitCommandPools() {
 			}
 		);
 	}
-	QuickVK::SetDebugName(m_device, m_commandPools[CommandType::Graphics], "Graphics Command Pool");
-	QuickVK::SetDebugName(m_device, m_commandPools[CommandType::AsyncCompute], "Async Command Pool");
-	QuickVK::SetDebugName(m_device, m_commandPools[CommandType::Copy], "Copy Command Pool");
-	QuickVK::SetDebugName(m_device, m_commandPools[CommandType::Present], "Present Command Pool");
+	VKQuick::SetDebugName(m_device, m_commandPools[CommandType::Graphics], "Graphics Command Pool");
+	VKQuick::SetDebugName(m_device, m_commandPools[CommandType::AsyncCompute], "Async Command Pool");
+	VKQuick::SetDebugName(m_device, m_commandPools[CommandType::Copy], "Copy Command Pool");
+	VKQuick::SetDebugName(m_device, m_commandPools[CommandType::Present], "Present Command Pool");
 }
 
 bool Instance::InitDeviceQueueIndices() {
@@ -546,7 +546,7 @@ void Instance::OnWindowResize(int width, int height) {
 
 	CompleteResize();
 
-	QuickVK::CmdBufferSubmit(
+	VKQuick::CmdBufferSubmit(
 		{
 			.buffer = *cmds,
 			.queue = m_queues[CommandType::Graphics],
@@ -567,7 +567,7 @@ void	Instance::BeginFrame() {
 
 	//Clear out any commands from the constructor
 	if (m_globalFrameID == 0) {
-		QuickVK::CmdBufferSubmit(
+		VKQuick::CmdBufferSubmit(
 			{
 				.buffer = context.cmdBuffer,
 				.queue = m_queues[CommandType::Graphics],
@@ -625,7 +625,7 @@ void	Instance::EndFrame() {
 
 	TransitionColourToPresent(context.cmdBuffer, m_currentFrameContext->colourImage);
 	//if (hostWindow.IsMinimised()) {
-	//	QuickVK::CmdBufferSubmit(
+	//	VKQuick::CmdBufferSubmit(
 	//		{
 	//			.buffer = context.cmdBuffer,
 	//			.queue	= m_queues[CommandType::Graphics],
@@ -635,7 +635,7 @@ void	Instance::EndFrame() {
 	//	);
 	//}
 	//else {
-	//	QuickVK::CmdBufferSubmit(
+	//	VKQuick::CmdBufferSubmit(
 	//		{
 	//			.buffer = context.cmdBuffer,
 	//			.queue = context.queues[CommandType::Graphics],
@@ -859,7 +859,7 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 
 	m_device.bindImageMemory(m_depthImage, m_depthMemory, 0);
 
-	bool depthStencil = QuickVK::FormatIsDepthStencil(m_vkInit.depthStencilFormat);
+	bool depthStencil = VKQuick::FormatIsDepthStencil(m_vkInit.depthStencilFormat);
 
 	vk::ImageAspectFlags aspectFlags = vk::ImageAspectFlagBits::eDepth;
 
@@ -882,7 +882,7 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 
 	m_depthView = m_device.createImageView(viewCreateInfo);
 
-	vk::UniqueCommandBuffer tempBuffer = QuickVK::CmdBufferCreateBegin(m_device, m_commandPools[CommandType::Graphics]);
+	vk::UniqueCommandBuffer tempBuffer = VKQuick::CmdBufferCreateBegin(m_device, m_commandPools[CommandType::Graphics]);
 
 	vk::ImageMemoryBarrier2 memBarier{
 		.srcStageMask	= vk::PipelineStageFlagBits2::eTopOfPipe,
@@ -903,9 +903,9 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 		}
 	};
 
-	QuickVK::ImageTransitionBarrier(*tempBuffer, m_depthImage, memBarier);
+	VKQuick::ImageTransitionBarrier(*tempBuffer, m_depthImage, memBarier);
 	
-	QuickVK::CmdBufferSubmit(
+	VKQuick::CmdBufferSubmit(
 		{
 			.buffer = *tempBuffer,
 			.queue = m_queues[CommandType::Graphics],
@@ -914,6 +914,6 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 		}
 	);
 
-	QuickVK::SetDebugName(m_device, m_depthImage , "DepthBuffer");
-	QuickVK::SetDebugName(m_device, m_depthView	, "DepthBuffer");
+	VKQuick::SetDebugName(m_device, m_depthImage , "DepthBuffer");
+	VKQuick::SetDebugName(m_device, m_depthView	, "DepthBuffer");
 }

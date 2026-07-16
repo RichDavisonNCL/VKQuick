@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -8,7 +8,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 #include "Buffer.h"
 
-namespace QuickVK {
+namespace VKQuick {
 	/*
 	DescriptorBufferWriter: A helper class for writing descriptors to a 
 	descriptor buffer. We MUST call Finish to ensure that the writes to the
@@ -45,7 +45,7 @@ namespace QuickVK {
 
 			vk::DeviceSize		offset = m_device.getDescriptorSetLayoutBindingOffsetEXT(m_layout, binding);
 
-			size_t descriptorSize = QuickVK::GetDescriptorSize(type, m_props);
+			size_t descriptorSize = VKQuick::GetDescriptorSize(type, m_props);
 
 			m_device.getDescriptorEXT(&getInfo, descriptorSize, ((char*)m_descriptorBufferMemory) + offset);
 
@@ -69,7 +69,7 @@ namespace QuickVK {
 
 			vk::DeviceSize		offset = m_device.getDescriptorSetLayoutBindingOffsetEXT(m_layout, binding);
 
-			size_t descriptorSize = QuickVK::GetDescriptorSize(type, m_props);
+			size_t descriptorSize = VKQuick::GetDescriptorSize(type, m_props);
 
 			m_device.getDescriptorEXT(&getInfo, descriptorSize, ((char*)m_descriptorBufferMemory) + offset);
 

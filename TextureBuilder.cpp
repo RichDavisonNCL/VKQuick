@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -10,7 +10,10 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Utils.h"
 //#include "TextureLoader.h"
 //
-using namespace QuickVK;
+using namespace VKQuick;
+
+TextureLoadFunction			TextureBuilder::s_loadFunction{};
+TextureLoadReleaseFunction	TextureBuilder::s_releaseFunction;
 
 TextureBuilder::TextureBuilder(vk::Device inDevice, MemoryManager& memManager) {
     m_sourceDevice   = inDevice;
@@ -72,7 +75,7 @@ TextureBuilder& TextureBuilder::WithCommandBuffer(vk::CommandBuffer inBuffer) {
     return *this;
 }
 
-UniqueTexture TextureBuilder::Build(const std::string& debugName) {
+UniqueTexture TextureBuilder::BuildEmpty(const std::string& debugName) {
     UniqueTexture tex = GenerateTexture(m_cmdBuffer, m_requestedSize, false, debugName);
 
     TextureJob job;
@@ -114,29 +117,26 @@ void TextureBuilder::FinaliseTexture(const std::string& debugName, vk::CommandBu
 }
 
 UniqueTexture TextureBuilder::BuildFromFile(const std::string& filename) {
-    char* texData = nullptr;
-    vk::Extent3D dimensions(0, 0, 1);
-    uint32_t channels    = 0;
-    uint32_t flags       = 0;
-   // TextureLoader::LoadTexture(filename, texData, dimensions.x, dimensions.y, channels, flags);
+    LoadedTexture texFile = s_loadFunction(filename);
 
     vk::ImageUsageFlags	realUsages = m_usages;
 
     m_usages |= vk::ImageUsageFlagBits::eTransferDst;
 
-    UniqueTexture tex = GenerateTexture(m_cmdBuffer, dimensions, false, filename);
+    UniqueTexture tex = GenerateTexture(m_cmdBuffer, texFile.dimensions, false, filename);
 
     TextureJob job;
     job.faceCount = 1;
-    job.dataSrcs[0] = texData;
+    job.dataSrcs[0] = texFile.texData;
     job.image = tex->GetImage();
     job.endLayout = m_layout;
     job.aspect = vk::ImageAspectFlagBits::eColor;
-    job.dimensions = dimensions;
-    job.faceByteCount = dimensions.width * dimensions.height * dimensions.depth * channels * sizeof(char);
+    job.dimensions = texFile.dimensions;
+    job.faceByteCount = texFile.dimensions.width * texFile.dimensions.height * texFile.dimensions.depth * texFile.channels * sizeof(char);
 
     UploadTextureData(m_cmdBuffer, job);
-    //TextureLoader::DeleteTextureData(job.dataSrcs[0]);
+
+    s_releaseFunction(texFile);
 
     FinaliseTexture(filename, m_cmdBuffer, job, tex);
 
@@ -280,7 +280,7 @@ void TextureBuilder::UploadTextureData(vk::CommandBuffer m_cmdBuffer, TextureJob
     }
     stagingBuffer.Unmap();
 
-    QuickVK::UploadTextureData(m_cmdBuffer, stagingBuffer, job.image, vk::ImageLayout::eUndefined, job.endLayout,
+    VKQuick::UploadTextureData(m_cmdBuffer, stagingBuffer, job.image, vk::ImageLayout::eUndefined, job.endLayout,
         vk::BufferImageCopy{
             .imageSubresource = {
                 .aspectMask = vk::ImageAspectFlagBits::eColor,
@@ -291,4 +291,9 @@ void TextureBuilder::UploadTextureData(vk::CommandBuffer m_cmdBuffer, TextureJob
         }
     );
     m_memManager->DiscardBuffer(stagingBuffer);
+}
+
+void TextureBuilder::SetFileHandlingFunctions(TextureLoadFunction loadFunc, TextureLoadReleaseFunction releaseFunc) {
+    s_loadFunction = loadFunc;
+    s_releaseFunction = releaseFunc;
 }

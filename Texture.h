@@ -1,17 +1,27 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "../NCLCoreClasses/Texture.h"
-#include "TextureBuilder.h"
+//#include "../NCLCoreClasses/Texture.h"
+//#include "TextureBuilder.h"
 #include "SmartTypes.h"
 
-namespace QuickVK {
+namespace VKQuick {
 	class MemoryManager;
+
+	struct LoadedTexture {
+		char* texData;
+		vk::Extent3D dimensions = { 0, 0, 1 };
+		uint32_t channels	= 0;
+		uint32_t flags		= 0;
+	};
+
+	using TextureLoadFunction			= std::function<LoadedTexture(const std::string& filename)>;
+	using TextureLoadReleaseFunction	= std::function<void(LoadedTexture& texture)>;
 
 	class Texture {
 		friend class TextureBuilder;

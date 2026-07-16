@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -7,7 +7,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-namespace QuickVK {
+namespace VKQuick {
 	extern vk::detail::DynamicLoader dynamicLoader;
 
 	bool MessageAssert(bool condition, const char* msg);
@@ -28,11 +28,11 @@ namespace QuickVK {
 	class ScopedDebugArea {
 	public:
 		ScopedDebugArea(vk::CommandBuffer inBuffer, const std::string& inName) {
-			QuickVK::BeginDebugArea(inBuffer, inName);
+			VKQuick::BeginDebugArea(inBuffer, inName);
 			m_cmdBuffer = inBuffer;
 		}
 		~ScopedDebugArea() {
-			QuickVK::EndDebugArea(m_cmdBuffer);
+			VKQuick::EndDebugArea(m_cmdBuffer);
 		}
 	private:
 		vk::CommandBuffer m_cmdBuffer;

@@ -1,4 +1,4 @@
-set(PROJECT_NAME QuickVK)
+set(PROJECT_NAME VKQuick)
 
 ################################################################################
 # Source groups

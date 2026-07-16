@@ -1,5 +1,5 @@
 /******************************************************************************
-This file is part of the QuickVK library
+This file is part of the VKQuick library
 
 Author:Rich Davison
 Contact:richgdavison@gmail.com
@@ -9,7 +9,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Instance.h"
 #include "Utils.h"
 
-using namespace QuickVK;
+using namespace VKQuick;
 
 DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::WithDescriptor(vk::DescriptorSetLayoutBinding binding, vk::DescriptorBindingFlags bindingFlags) {
 	m_addedBindings.emplace_back(binding);
