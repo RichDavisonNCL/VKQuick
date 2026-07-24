@@ -6,21 +6,12 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "Instance.h"
-//#include "VulkanMesh.h"
 #include "Texture.h"
 #include "TextureBuilder.h"
 #include "DescriptorSetLayoutBuilder.h"
 
 #include "Utils.h"
 
-//#ifdef _WIN32
-//#include "Win32Window.h"
-//using namespace NCL::Win32Code;
-//#endif
-//
-//#define VMA_IMPLEMENTATION
-//#include "vma/vk_mem_alloc.h"
-//
 using namespace VKQuick;
 
 Instance::Instance(const VKQuickInitialisation& vkInitInfo)
@@ -43,7 +34,7 @@ Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 	InitCommandPools();
 	InitDefaultDescriptorPool();
 
-	//OnWindowResize(window.GetScreenSize().x, window.GetScreenSize().y);
+	OnWindowResize(vkInitInfo.initialWidth, vkInitInfo.initialHeight);
 	InitFrameStates(m_vkInit.framesInFlight);
 
 	m_pipelineCache = m_device.createPipelineCache(vk::PipelineCacheCreateInfo());
@@ -231,17 +222,15 @@ bool Instance::InitGPUDevice() {
 }
 
 bool Instance::InitSurface() {
-//#ifdef _WIN32
-//	Win32Window* window = (Win32Window*)&hostWindow;
-//
-//	m_surface = m_instance.createWin32SurfaceKHR(
-//		{
-//			.flags = {},
-//			.hinstance = window->GetInstance(),
-//			.hwnd = window->GetHandle()
-//		}
-//	);
-//#endif
+#ifdef _WIN32
+	m_surface = m_instance.createWin32SurfaceKHR(
+		{
+			.flags = {},
+			.hinstance = m_vkInit.win32Instance,
+			.hwnd = m_vkInit.win32Handle,
+		}
+	);
+#endif
 
 	auto formats = m_physicalDevice.getSurfaceFormatsKHR(m_surface);
 	if (formats.empty()) {
@@ -314,8 +303,6 @@ void Instance::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 
 	vk::SurfaceCapabilitiesKHR surfaceCaps = m_physicalDevice.getSurfaceCapabilitiesKHR(m_surface);
 
-	vk::Extent2D swapExtents;// = vk::Extent2D((int)hostWindow.GetScreenSize().x, (int)hostWindow.GetScreenSize().y);
-
 	auto presentModes = m_physicalDevice.getSurfacePresentModesKHR(m_surface); //Type is of vector of PresentModeKHR
 
 	vk::PresentModeKHR currentPresentMode	= vk::PresentModeKHR::eFifo;
@@ -352,7 +339,7 @@ void Instance::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 		.setSurface(m_surface)
 		.setImageColorSpace(m_surfaceSpace)
 		.setImageFormat(m_surfaceFormat)
-		.setImageExtent(swapExtents)
+		.setImageExtent(m_windowSize)
 		.setMinImageCount(idealImageCount)
 		.setOldSwapchain(oldChain)
 		.setImageArrayLayers(1)
@@ -397,8 +384,8 @@ void Instance::InitBufferChain(vk::CommandBuffer  cmdBuffer) {
 			};
 
 			vk::FramebufferCreateInfo createInfo = vk::FramebufferCreateInfo()
-				//.setWidth(hostWindow.GetScreenSize().x)
-				//.setHeight(hostWindow.GetScreenSize().y)
+				.setWidth(m_windowSize.width)
+				.setHeight(m_windowSize.height)
 				.setLayers(1)
 				.setAttachmentCount(std::size(attachments))
 				.setPAttachments(attachments)
@@ -499,43 +486,37 @@ bool Instance::SupportsAsyncPresent() const {
 }
 
 void Instance::OnWindowResize(int width, int height) {
-	//if (width == windowSize.x && height == windowSize.y) {
-	//	m_device.waitIdle();
-	//	return;
-	//}
-	struct Temp {
-		float x;
-		float y;
-	};
-	Temp windowSize;
-
+	if (width == m_windowSize.width && height == m_windowSize.height) {
+		m_device.waitIdle();
+		return;
+	}
 	if (width == 0 && height == 0) {
 		return;
 	}
-	//windowSize = { width, height };
+	m_windowSize = { (uint32_t)width, (uint32_t)height };
 
 	m_defaultScreenRect = {
 		.offset = {0,0},
-		.extent = { (uint32_t)windowSize.x, (uint32_t)windowSize.y }
+		.extent = m_windowSize
 	};
 
 	m_defaultScissor = {
 		.offset = {0,0},
-		.extent = { (uint32_t)windowSize.x, (uint32_t)windowSize.y }
+		.extent = m_windowSize
 	};
 		
 	if (m_vkInit.useOpenGLCoordinates) {
-		m_defaultViewport = vk::Viewport(0.0f, (float)windowSize.y, (float)windowSize.x, (float)windowSize.y, -1.0f, 1.0f);
+		m_defaultViewport = vk::Viewport(0.0f, (float)m_windowSize.height, (float)m_windowSize.width, (float)m_windowSize.height, -1.0f, 1.0f);
 	}
 	else {
-		m_defaultViewport = vk::Viewport(0.0f, (float)windowSize.y, (float)windowSize.x, -(float)windowSize.y, 0.0f, 1.0f);
+		m_defaultViewport = vk::Viewport(0.0f, (float)m_windowSize.height, (float)m_windowSize.width, -(float)m_windowSize.height, 0.0f, 1.0f);
 	}
 
-	std::cout << __FUNCTION__ << " New dimensions: " << windowSize.x << " , " << windowSize.y << "\n";
+	std::cout << __FUNCTION__ << " New dimensions: " << m_windowSize.width << " , " << m_windowSize.height << "\n";
 
 	m_device.waitIdle();
 	
-	//CreateDepthBufer(hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y);
+	CreateDepthBufer((uint32_t)width, (uint32_t)height);
 	
 	InitDefaultRenderPass();
 
@@ -543,8 +524,6 @@ void Instance::OnWindowResize(int width, int height) {
 	InitBufferChain(*cmds);
 
 	m_device.waitIdle();
-
-	CompleteResize();
 
 	VKQuick::CmdBufferSubmit(
 		{
@@ -558,8 +537,8 @@ void Instance::OnWindowResize(int width, int height) {
 	m_device.waitIdle();
 }
 
-void Instance::CompleteResize() {
-
+void Instance::OnWindowMinimise(bool isMinimised) {
+	m_windowMinimised = isMinimised;
 }
 
 void	Instance::BeginFrame() {
@@ -624,24 +603,24 @@ void	Instance::EndFrame() {
 	const FrameContext& context = GetFrameContext();
 
 	TransitionColourToPresent(context.cmdBuffer, m_currentFrameContext->colourImage);
-	//if (hostWindow.IsMinimised()) {
-	//	VKQuick::CmdBufferSubmit(
-	//		{
-	//			.buffer = context.cmdBuffer,
-	//			.queue	= m_queues[CommandType::Graphics],
-	//			.device = m_device,
-	//			.wait	= true
-	//		}
-	//	);
-	//}
-	//else {
-	//	VKQuick::CmdBufferSubmit(
-	//		{
-	//			.buffer = context.cmdBuffer,
-	//			.queue = context.queues[CommandType::Graphics],
-	//		}
-	//	);
-	//}
+	if (m_windowMinimised) {
+		VKQuick::CmdBufferSubmit(
+			{
+				.buffer = context.cmdBuffer,
+				.queue	= m_queues[CommandType::Graphics],
+				.device = m_device,
+				.wait	= true
+			}
+		);
+	}
+	else {
+		VKQuick::CmdBufferSubmit(
+			{
+				.buffer = context.cmdBuffer,
+				.queue = context.queues[CommandType::Graphics],
+			}
+		);
+	}
 
 	const uint64_t nextWaitID = m_globalFrameID + m_frameContexts.size();
 	
@@ -680,18 +659,18 @@ void	Instance::EndFrame() {
 }
 
 void Instance::SwapBuffers() {
-	//if (!hostWindow.IsMinimised()) {
-	//	vk::Queue	gfxQueue		= m_queues[CommandType::Graphics];
-	//	vk::Result	presentResult = gfxQueue.presentKHR(
-	//		{
-	//			.waitSemaphoreCount = 1,
-	//			.pWaitSemaphores	= &m_currentSwapState->presentSempaphore,
-	//			.swapchainCount		= 1,
-	//			.pSwapchains		= &m_swapChain,
-	//			.pImageIndices		= &m_currentSwap,
-	//		}
-	//	);	
-	//}
+	if (!m_windowMinimised) {
+		vk::Queue	gfxQueue		= m_queues[CommandType::Graphics];
+		vk::Result	presentResult = gfxQueue.presentKHR(
+			{
+				.waitSemaphoreCount = 1,
+				.pWaitSemaphores	= &m_currentSwapState->presentSempaphore,
+				.swapchainCount		= 1,
+				.pSwapchains		= &m_swapChain,
+				.pImageIndices		= &m_currentSwap,
+			}
+		);	
+	}
 }
 
 void	Instance::InitDefaultRenderPass() {

@@ -10,6 +10,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Instance.h"
 #include "Utils.h"
 
+#define VMA_IMPLEMENTATION
+#include "vma/vk_mem_alloc.h"
+
 using namespace VKQuick;
 
 VMAMemoryManager::VMAMemoryManager(vk::Device device, vk::PhysicalDevice physicalDevice, vk::Instance instance, const VKQuickInitialisation& vkInit) {
@@ -23,7 +26,13 @@ VMAMemoryManager::VMAMemoryManager(vk::Device device, vk::PhysicalDevice physica
 	m_allocatorInfo.instance			= instance;
 	m_allocatorInfo.vulkanApiVersion	= VK_MAKE_API_VERSION(0, vkInit.majorVersion, vkInit.minorVersion, 0);
 
-	m_allocatorInfo.flags |= vkInit.vmaFlags;
+	for (const auto& feature : vkInit.features) {
+		VkStructureType* sType = (VkStructureType*)feature;
+		if (*sType == VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES) {
+			m_allocatorInfo.flags |= VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+			break;
+		}
+	}
 
 	m_framesInFlight = vkInit.framesInFlight;
 

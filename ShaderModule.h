@@ -18,7 +18,7 @@ namespace VKQuick {
 		void CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges)						const;
 
 	//protected:		
-		void AddReflectionData(uint32_t dataSize, const void* data, vk::ShaderStageFlags stage);	
+		void AddReflectionData(const std::vector<char>& data, vk::ShaderStageFlags stage);
 
 		std::vector<std::vector<vk::DescriptorSetLayoutBinding>>	m_allLayoutsBindings;
 
@@ -27,4 +27,7 @@ namespace VKQuick {
 		vk::UniqueShaderModule				m_shaderModule;
 		vk::ShaderStageFlagBits				m_shaderStage;
 	};
+
+	using UniqueShaderModule = std::unique_ptr<ShaderModule>;
+	using SharedShaderModule = std::shared_ptr<ShaderModule>;
 }

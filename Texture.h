@@ -6,9 +6,6 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-//#include "../NCLCoreClasses/Texture.h"
-//#include "TextureBuilder.h"
-#include "SmartTypes.h"
 
 namespace VKQuick {
 	class MemoryManager;
@@ -76,4 +73,7 @@ namespace VKQuick {
 
 		MemoryManager*			m_memManager = nullptr;
 	};
+
+	using UniqueTexture = std::unique_ptr<Texture>;
+	using SharedTexture = std::shared_ptr<Texture>;
 }

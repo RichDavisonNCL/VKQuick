@@ -18,7 +18,6 @@ set(Header_Files
     "RenderPassBuilder.h"
     "ShaderModule.h"
     "Texture.h"
-	"SmartTypes.h"
     "DescriptorSetWriter.h"
     "DescriptorSetBinder.h"
 	"DescriptorBufferWriter.h"
@@ -81,6 +80,7 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
     "$<$<COMPILE_LANGUAGE:CXX>:<string$<ANGLE-R>>"
     "$<$<COMPILE_LANGUAGE:CXX>:<iosfwd$<ANGLE-R>>"
     "$<$<COMPILE_LANGUAGE:CXX>:<functional$<ANGLE-R>>"
+    "$<$<COMPILE_LANGUAGE:CXX>:<filesystem$<ANGLE-R>>"
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
