@@ -9,8 +9,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 #include "MemoryManager.h"
 #include "Pipeline.h"
-#include "SmartTypes.h"
-#include "vma/vk_mem_alloc.h"
+
 using std::string;
 
 namespace VKQuick {
@@ -78,8 +77,6 @@ namespace VKQuick {
 		uint32_t	defaultDescriptorPoolSamplerCount	= 32;
 		uint32_t	defaultDescriptorPoolAccelerationStructureCount	= 0;
 
-		VmaAllocatorCreateFlags		vmaFlags = {};
-
 		uint32_t	majorVersion	= 1;
 		uint32_t	minorVersion	= 1;
 
@@ -98,6 +95,15 @@ namespace VKQuick {
 
 		std::vector<const char*>	deviceExtensions;	
 		std::vector<const char*>	deviceLayers;
+
+
+		uint32_t	initialWidth;
+		uint32_t	initialHeight;
+
+#ifdef _WIN32
+		HWND		win32Handle;
+		HINSTANCE	win32Instance;
+#endif
 	};
 
 	class Instance {
@@ -105,7 +111,7 @@ namespace VKQuick {
 		Instance(const VKQuickInitialisation& vkInit);
 		~Instance();
 
-		virtual bool HasInitialised() const { return m_device; }
+		bool HasInitialised() const { return m_device; }
 
 		vk::Device GetDevice() const {
 			return m_device;
@@ -137,10 +143,10 @@ namespace VKQuick {
 		void SwapBuffers();
 
 		void OnWindowResize(int w, int h);
+		void OnWindowMinimise(bool isMinimised);
 	protected:
-		virtual void	CompleteResize();
-		virtual void	InitDefaultRenderPass();
-		virtual void	InitDefaultDescriptorPool();
+		void	InitDefaultRenderPass();
+		void	InitDefaultDescriptorPool();
 
 	private: 
 		void	InitCommandPools();
@@ -208,5 +214,9 @@ namespace VKQuick {
 		uint32_t					m_currentFrameContextID	= 0; //Frame context for this frame
 		uint32_t					m_currentSwap			= 0; //To index our swapchain 
 		uint64_t					m_globalFrameID			= 0;
+
+		vk::Extent2D				m_windowSize;
+
+		bool						m_windowMinimised		= false;
 	};
 }

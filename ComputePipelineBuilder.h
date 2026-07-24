@@ -9,7 +9,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Pipeline.h"
 #include "ShaderModule.h"
 #include "PipelineBuilderBase.h"
-#include "SmartTypes.h"
 
 namespace VKQuick {
 	/*

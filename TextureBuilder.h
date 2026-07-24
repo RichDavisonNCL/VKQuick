@@ -6,7 +6,6 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include "SmartTypes.h"
 #include "Buffer.h"
 #include "MemoryManager.h"
 #include "Texture.h"

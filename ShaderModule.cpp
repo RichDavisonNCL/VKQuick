@@ -16,26 +16,42 @@ using std::ifstream;
 
 using namespace VKQuick;
 
-ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
-	char* data;
-	size_t dataSize = 0;
-	//Assets::ReadBinaryFile(Assets::SHADERDIR + "VK/" + filename, &data, dataSize);
+std::vector<char>	ReadBinaryFile(const std::string& filename) {
+	std::ifstream file(filename, std::ios::binary);
 
-	if (dataSize > 0) {
+	std::filesystem::path inputFilePath{ filename };
+
+	if (!std::filesystem::exists(inputFilePath)) {
+		std::cout << __FUNCTION__ << ": Failed to read binary file " << filename << "\n";
+		return {};
+	}
+
+	uintmax_t length = std::filesystem::file_size(inputFilePath);
+	std::vector<char> data(length);
+	file.read(data.data(), length);
+
+	return data;
+}
+
+
+ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
+	std::vector<char> data = ReadBinaryFile(filename);
+
+	if (data.size() > 0) {
 		m_shaderModule = device.createShaderModuleUnique(
 			{
 				.flags		= {},
-				.codeSize	= dataSize,
-				.pCode		= (uint32_t*)data
+				.codeSize	= data.size(),
+				.pCode		= (const uint32_t*)data.data()	
 			}
 		);
-		AddReflectionData(dataSize, data, stage);
+		AddReflectionData(data, stage);
 
 		VKQuick::SetDebugName(device, *m_shaderModule, filename);
 	}
 	else {
 		std::cout << __FUNCTION__ << ": Problem loading shader file " << filename << "!\n";
-		assert(dataSize);
+		assert(data.size() > 0);
 	}
 	m_shaderStage = stage;
 }
@@ -91,9 +107,9 @@ void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>
 	}
 }
 
-void ShaderModule::AddReflectionData(uint32_t dataSize, const void* data, vk::ShaderStageFlags stage) {
+void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderStageFlags stage) {
 	SpvReflectShaderModule module;
-	SpvReflectResult result = spvReflectCreateShaderModule(dataSize, data, &module);
+	SpvReflectResult result = spvReflectCreateShaderModule(data.size(), data.data(), &module);
 	assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
 	uint32_t descriptorCount = 0;
