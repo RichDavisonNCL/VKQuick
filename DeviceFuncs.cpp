@@ -6,16 +6,6 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 
-//template <typename T>
-//void USEDEVICENAMESPACE SetDebugName(USEDEVICESIGNATURE T handle, const std::string& debugName) {
-//	device.setDebugUtilsObjectNameEXT(
-//		vk::DebugUtilsObjectNameInfoEXT()
-//		.setObjectType(T::objectType)
-//		.setObjectHandle(uint64_t(static_cast<T::CType>(handle)))
-//		.setPObjectName(debugName.c_str())
-//	);
-//}
-
 vk::UniqueCommandBuffer	USEDEVICENAMESPACE CmdBufferCreate(USEDEVICESIGNATURE vk::CommandPool fromPool, const std::string& debugName) {
 	std::vector<vk::UniqueCommandBuffer> buffers = device.allocateCommandBuffersUnique(
 		{

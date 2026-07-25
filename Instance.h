@@ -49,13 +49,10 @@ namespace VKQuick {
 #define USEDEVICESIGNATURE
 #define USEDEVICEPARAMETER
 #define USEDEVICENAMESPACE
-#define USEDEVICEIGNORESIGS
 #include "DeviceFuncs.h"
-#include "DeviceFuncs.cpp"
 #undef USEDEVICESIGNATURE
 #undef USEDEVICEPARAMETER
 #undef USEDEVICENAMESPACE
-#undef USEDEVICEIGNORESIGS
 	};
 
 	struct AcquireState {

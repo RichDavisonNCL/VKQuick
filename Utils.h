@@ -64,15 +64,6 @@ namespace VKQuick {
 
 	void	CmdBufferSubmit(const CmdSubmission& submission);
 
-	void WriteBufferDescriptor(vk::Device device,
-		const vk::PhysicalDeviceDescriptorBufferPropertiesEXT& props,
-		void* descriptorBufferMemory,
-		vk::DescriptorSetLayout m_layout,
-		size_t layoutIndex,
-		vk::DeviceAddress bufferAddress,
-		size_t bufferSize
-	);
-
 	size_t GetDescriptorSize(vk::DescriptorType type, const vk::PhysicalDeviceDescriptorBufferPropertiesEXT& props);
 
 	void  UploadTextureData(vk::CommandBuffer  buffer, vk::Buffer tempBuffer, vk::Image image, vk::ImageLayout currentLyout, vk::ImageLayout endLayout, vk::BufferImageCopy copyInfo);

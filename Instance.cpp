@@ -901,3 +901,11 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 	VKQuick::SetDebugName(m_device, m_depthImage , "DepthBuffer");
 	VKQuick::SetDebugName(m_device, m_depthView	, "DepthBuffer");
 }
+
+#define USEDEVICESIGNATURE
+#define USEDEVICEPARAMETER
+#define USEDEVICENAMESPACE VKQuick::FrameContext::
+#include "DeviceFuncs.cpp"
+#undef USEDEVICESIGNATURE
+#undef USEDEVICEPARAMETER
+#undef USEDEVICENAMESPACE 

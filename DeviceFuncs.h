@@ -16,8 +16,6 @@ void USEDEVICENAMESPACE SetDebugName(USEDEVICESIGNATURE T handle, const std::str
 	);
 }
 
-#ifndef USEDEVICEIGNORESIGS
-
 vk::UniqueCommandBuffer	USEDEVICENAMESPACE CmdBufferCreate(USEDEVICESIGNATURE vk::CommandPool fromPool, const std::string& debugName);
 
 vk::UniqueCommandBuffer	USEDEVICENAMESPACE CmdBufferCreateBegin(USEDEVICESIGNATURE vk::CommandPool fromPool, const std::string& debugName = "");
@@ -68,13 +66,11 @@ vk::Result	USEDEVICENAMESPACE TimelineSemaphoreHostWait(USEDEVICESIGNATURE vk::S
 void	USEDEVICENAMESPACE TimelineSemaphoreHostSignal(USEDEVICESIGNATURE vk::Semaphore semaphore, uint64_t signalVal);
 
 /*Descriptor Buffer Writing*/
-	void USEDEVICENAMESPACE WriteBufferDescriptor(USEDEVICESIGNATURE
-		const vk::PhysicalDeviceDescriptorBufferPropertiesEXT & props,
-		void* descriptorBufferMemory,
-		vk::DescriptorSetLayout layout,
-		size_t layoutIndex,
-		vk::DeviceAddress bufferAddress,
-		size_t bufferSize
-	);
-
-#endif
+void USEDEVICENAMESPACE WriteBufferDescriptor(USEDEVICESIGNATURE
+	const vk::PhysicalDeviceDescriptorBufferPropertiesEXT & props,
+	void* descriptorBufferMemory,
+	vk::DescriptorSetLayout layout,
+	size_t layoutIndex,
+	vk::DeviceAddress bufferAddress,
+	size_t bufferSize
+);
