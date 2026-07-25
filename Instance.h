@@ -46,6 +46,16 @@ namespace VKQuick {
 		uint32_t			frameID = 0;
 		uint32_t			cycleID = 0;
 		uint64_t			waitID	= 0;
+#define USEDEVICESIGNATURE
+#define USEDEVICEPARAMETER
+#define USEDEVICENAMESPACE
+#define USEDEVICEIGNORESIGS
+#include "DeviceFuncs.h"
+#include "DeviceFuncs.cpp"
+#undef USEDEVICESIGNATURE
+#undef USEDEVICEPARAMETER
+#undef USEDEVICENAMESPACE
+#undef USEDEVICEIGNORESIGS
 	};
 
 	struct AcquireState {

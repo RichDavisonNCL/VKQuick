@@ -103,15 +103,6 @@ void	VKQuick::ImageTransitionBarrier(vk::CommandBuffer  cmdBuffer, vk::Image ima
 	});
 }
 
-//void VKQuick::TransitionUndefinedToColourSpanTest(vk::CommandBuffer  buffer, const std::span< vk::Image >& t) {
-//	for (vk::Image i : t) {
-//		ImageTransitionBarrier(buffer, i,
-//			vk::ImageLayout::eUndefined, vk::ImageLayout::eColorAttachmentOptimal,
-//			vk::ImageAspectFlagBits::eColor, vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-//			vk::PipelineStageFlagBits2::eColorAttachmentOutput);
-//	}
-//}
-
 void VKQuick::TransitionUndefinedToColour(vk::CommandBuffer  buffer, vk::Image t) {
 	ImageTransitionBarrier(buffer, t,
 		vk::ImageLayout::eUndefined, vk::ImageLayout::eColorAttachmentOptimal,
@@ -160,31 +151,9 @@ bool VKQuick::MessageAssert(bool condition, const char* msg) {
 	return condition;
 }
 
-vk::UniqueCommandBuffer	VKQuick::CmdBufferCreate(vk::Device device, vk::CommandPool fromPool, const std::string& debugName) {
-	std::vector<vk::UniqueCommandBuffer> buffers = device.allocateCommandBuffersUnique(
-		{
-			.commandPool		= fromPool,
-			.level				= vk::CommandBufferLevel::ePrimary,
-			.commandBufferCount = 1
-		}
-	);
-
-	if (!debugName.empty()) {
-		VKQuick::SetDebugName(device, *buffers[0], debugName);
-	}
-	return std::move(buffers[0]);
-}
-
 void	VKQuick::CmdBufferResetBegin(vk::CommandBuffer  buffer) {
 	buffer.reset();
 	buffer.begin(vk::CommandBufferBeginInfo());
-}
-
-vk::UniqueCommandBuffer	VKQuick::CmdBufferCreateBegin(vk::Device device, vk::CommandPool fromPool, const std::string& debugName) {
-	vk::UniqueCommandBuffer buffer = CmdBufferCreate(device, fromPool, debugName);
-	vk::CommandBufferBeginInfo beginInfo = vk::CommandBufferBeginInfo();
-	buffer->begin(beginInfo);
-	return std::move(buffer);
 }
 
 void	VKQuick::CmdBufferSubmit(const CmdSubmission& submission) {
@@ -234,259 +203,6 @@ void	VKQuick::CmdBufferSubmit(const CmdSubmission& submission) {
 	}	
 }
 
-void	VKQuick::WriteDescriptor(vk::Device device, vk::WriteDescriptorSet setInfo, vk::DescriptorBufferInfo bufferInfo) {
-	setInfo.descriptorCount = 1;
-	setInfo.pBufferInfo = &bufferInfo;
-	if (bufferInfo.range == 0) {
-		bufferInfo.range = VK_WHOLE_SIZE;
-	}
-	device.updateDescriptorSets(1, &setInfo, 0, nullptr);
-}
-
-void	VKQuick::WriteDescriptor(vk::Device device, vk::WriteDescriptorSet setInfo, vk::DescriptorImageInfo imageInfo) {
-	setInfo.descriptorCount = 1;
-	setInfo.pImageInfo = &imageInfo;
-	device.updateDescriptorSets(1, &setInfo, 0, nullptr);
-}
-
-void	VKQuick::WriteCombinedImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, vk::ImageView view, vk::Sampler sampler, vk::ImageLayout layout) {
-	WriteCombinedImageDescriptor(device, set, bindingNum, 0, view, sampler, layout);
-}
-
-void	VKQuick::WriteCombinedImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, uint32_t subIndex, vk::ImageView view, vk::Sampler sampler, vk::ImageLayout layout) {
-	vk::DescriptorImageInfo imageInfo{
-		.sampler		= sampler,
-		.imageView		= view,
-		.imageLayout	= layout
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.dstSet				= set,
-		.dstBinding			= bindingNum,
-		.dstArrayElement	= subIndex,
-		.descriptorCount	= 1,
-		.descriptorType		= vk::DescriptorType::eCombinedImageSampler,
-		.pImageInfo			= &imageInfo
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, vk::ImageView view, vk::ImageLayout layout) {
-	VKQuick::WriteImageDescriptor(device, set, bindingNum, 0, view, layout);
-}
-
-void	VKQuick::WriteImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, uint32_t subIndex, vk::ImageView view, vk::ImageLayout layout) {
-	vk::DescriptorImageInfo imageInfo{
-		.imageView		= view,
-		.imageLayout	= layout
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.dstSet				= set,
-		.dstBinding			= bindingNum,
-		.dstArrayElement	= subIndex,
-		.descriptorCount	= 1,
-		.descriptorType		= vk::DescriptorType::eSampledImage,
-		.pImageInfo			= &imageInfo
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteSamplerDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, vk::Sampler sampler) {
-	WriteSamplerDescriptor(device, set, bindingNum, 0, sampler);
-}
-
-void	VKQuick::WriteSamplerDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, uint32_t subIndex, vk::Sampler sampler) {
-	vk::DescriptorImageInfo imageInfo{
-		.sampler = sampler,
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.dstSet				= set,
-		.dstBinding			= bindingNum,
-		.dstArrayElement	= 0,
-		.descriptorCount	= 1,
-		.descriptorType		= vk::DescriptorType::eSampler,
-		.pImageInfo			= &imageInfo
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteStorageImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, vk::ImageView view, vk::ImageLayout layout) {
-	WriteStorageImageDescriptor(device, set, bindingNum, 0, view, layout);
-}
-
-void	VKQuick::WriteStorageImageDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingNum, uint32_t subIndex, vk::ImageView view, vk::ImageLayout layout) {
-	vk::DescriptorImageInfo imageInfo{
-		.imageView		= view,
-		.imageLayout	= layout
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.dstSet				= set,
-		.dstBinding			= bindingNum,
-		.dstArrayElement	= 0,
-		.descriptorCount	= 1,
-		.descriptorType		= vk::DescriptorType::eStorageImage,
-		.pImageInfo			= &imageInfo
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteBufferDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingSlot, uint32_t subIndex, vk::DescriptorType bufferType, vk::Buffer buff, std::size_t offset, std::size_t range) {
-	vk::DescriptorBufferInfo descriptorInfo{
-		.buffer = buff,
-		.offset = offset,
-		.range	= range
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.dstSet				= set,
-		.dstBinding			= bindingSlot,
-		.dstArrayElement	= subIndex,
-		.descriptorCount	= 1,
-		.descriptorType		= bufferType,
-		.pBufferInfo		= &descriptorInfo
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteBufferDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingSlot, vk::DescriptorType bufferType, vk::Buffer buff, std::size_t offset, std::size_t range) {
-	WriteBufferDescriptor(device, set, bindingSlot, 0, bufferType, buff, offset, range);
-}
-
-void	VKQuick::WriteInlineUniformDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingSlot, void* data, std::size_t byteCount) {
-	vk::WriteDescriptorSetInlineUniformBlock inlineWrite = {
-		.dataSize	= (uint32_t)byteCount,
-		.pData		= &data
-	};
-
-	vk::WriteDescriptorSet descriptorWrite = {
-		.pNext				= &inlineWrite,
-		.dstSet				= set,
-		.dstBinding			= bindingSlot,
-		.dstArrayElement	= 0,
-		.descriptorCount	= (uint32_t)byteCount,
-		.descriptorType		= vk::DescriptorType::eInlineUniformBlock,
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-void	VKQuick::WriteTLASDescriptor(vk::Device device, vk::DescriptorSet set, uint32_t bindingSlot, vk::AccelerationStructureKHR tlas) {
-	vk::WriteDescriptorSetAccelerationStructureKHR descriptorInfo{
-		.accelerationStructureCount = 1,
-		.pAccelerationStructures	= &tlas
-	};
-
-	vk::WriteDescriptorSet descriptorWrite{
-		.pNext				= &descriptorInfo,
-		.dstSet				= set,
-		.dstBinding			= bindingSlot,
-		.descriptorCount	= 1,
-		.descriptorType		= vk::DescriptorType::eAccelerationStructureKHR,
-	};
-
-	device.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
-}
-
-vk::UniqueDescriptorSet VKQuick::CreateDescriptorSet(vk::Device device, vk::DescriptorPool pool, vk::DescriptorSetLayout  layout) {
-	vk::DescriptorSetAllocateInfo allocateInfo{
-		.descriptorPool		= pool,
-		.descriptorSetCount = 1,
-		.pSetLayouts		= &layout
-	};
-	return std::move(device.allocateDescriptorSetsUnique(allocateInfo)[0]);
-}
-
-vk::UniqueDescriptorSet VKQuick::CreateDescriptorSet(vk::Device device, vk::DescriptorPool pool, vk::DescriptorSetLayout  layout, uint32_t variableDescriptorCount) {
-	vk::DescriptorSetVariableDescriptorCountAllocateInfoEXT variableDescriptorInfo{
-		.descriptorSetCount = 1,
-		.pDescriptorCounts = &variableDescriptorCount
-	};
-	vk::DescriptorSetAllocateInfo allocateInfo{
-		.pNext				= (const void*)&variableDescriptorInfo,
-		.descriptorPool		= pool,
-		.descriptorSetCount = 1,
-		.pSetLayouts		= &layout,	
-	};
-	return std::move(device.allocateDescriptorSetsUnique(allocateInfo)[0]);
-}
-
-vk::UniqueSemaphore VKQuick::CreateTimelineSemaphore(vk::Device device, uint64_t initialValue) {
-	vk::SemaphoreTypeCreateInfo typeCreateInfo{
-		.semaphoreType = vk::SemaphoreType::eTimeline,
-		.initialValue = initialValue
-	};
-	vk::SemaphoreCreateInfo createInfo{
-		.pNext = &typeCreateInfo,
-	};
-	return std::move(device.createSemaphoreUnique(createInfo));
-}
-
-vk::Result	VKQuick::TimelineSemaphoreHostWait(vk::Device device, vk::Semaphore semaphore, uint64_t waitVal, uint64_t waitTime) {
-	vk::SemaphoreWaitInfo waitInfo{
-		.semaphoreCount = 1,
-		.pSemaphores	= &semaphore,
-		.pValues		= &waitVal
-	};
-	return device.waitSemaphores(waitInfo, UINT64_MAX);
-}
-
-void	VKQuick::TimelineSemaphoreHostSignal(vk::Device device, vk::Semaphore semaphore, uint64_t signalVal) {
-	vk::SemaphoreSignalInfo signalInfo{
-		.semaphore	= semaphore,
-		.value		= signalVal
-	};
-	device.signalSemaphore(signalInfo);
-}
-
-/*Descriptor Buffer Writing*/
-void VKQuick::WriteBufferDescriptor(vk::Device device,
-	const vk::PhysicalDeviceDescriptorBufferPropertiesEXT& props,
-	void* descriptorBufferMemory,
-	vk::DescriptorSetLayout layout,
-	size_t layoutIndex,
-	vk::DeviceAddress bufferAddress,
-	size_t bufferSize
-) {
-	vk::DescriptorAddressInfoEXT address{
-		.address	= bufferAddress,
-		.range		= bufferSize
-	};
-	vk::DescriptorGetInfoEXT getInfo{
-		.type = vk::DescriptorType::eUniformBuffer,
-		.data = &address
-	};
-	
-	vk::DeviceSize offset = device.getDescriptorSetLayoutBindingOffsetEXT(layout, layoutIndex);
-
-	device.getDescriptorEXT(&getInfo, props.uniformBufferDescriptorSize, ((char*)descriptorBufferMemory) + offset);
-}
-
-size_t VKQuick::GetDescriptorSize(vk::DescriptorType type, const vk::PhysicalDeviceDescriptorBufferPropertiesEXT& props) {
-	switch (type) {
-		case vk::DescriptorType::eSampler:					return props.samplerDescriptorSize;
-		case vk::DescriptorType::eCombinedImageSampler:		return props.combinedImageSamplerDescriptorSize;
-		case vk::DescriptorType::eSampledImage:				return props.sampledImageDescriptorSize;
-		case vk::DescriptorType::eStorageImage:				return props.storageImageDescriptorSize;
-		case vk::DescriptorType::eUniformTexelBuffer:		return props.uniformTexelBufferDescriptorSize;
-		case vk::DescriptorType::eStorageTexelBuffer:		return props.storageTexelBufferDescriptorSize;
-		case vk::DescriptorType::eUniformBuffer:			return props.uniformBufferDescriptorSize;
-		case vk::DescriptorType::eStorageBuffer:			return props.storageBufferDescriptorSize;
-		case vk::DescriptorType::eUniformBufferDynamic:		return props.uniformBufferDescriptorSize;//??
-		case vk::DescriptorType::eStorageBufferDynamic:		return props.storageBufferDescriptorSize;//??
-		case vk::DescriptorType::eInputAttachment:			return props.inputAttachmentDescriptorSize;		
-		case vk::DescriptorType::eAccelerationStructureKHR: return props.accelerationStructureDescriptorSize;
-		default: return 0;
-	}
-};
-
 void  VKQuick::UploadTextureData(vk::CommandBuffer  buffer, vk::Buffer tempBuffer, vk::Image image, vk::ImageLayout currentLyout, vk::ImageLayout endLayout, vk::BufferImageCopy copyInfo) {
 	ImageTransitionBarrier(buffer, image, 
 		currentLyout, 
@@ -526,3 +242,11 @@ bool  VKQuick::FormatIsDepthStencil(vk::Format format) {
 	}
 	return false;
 }
+
+#define USEDEVICESIGNATURE vk::Device device,
+#define USEDEVICEPARAMETER device,
+#define USEDEVICENAMESPACE VKQuick::
+#include "DeviceFuncs.cpp"
+#undef USEDEVICESIGNATURE
+#undef USEDEVICEPARAMETER
+#undef USEDEVICENAMESPACE
