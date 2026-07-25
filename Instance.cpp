@@ -9,10 +9,13 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Texture.h"
 #include "TextureBuilder.h"
 #include "DescriptorSetLayoutBuilder.h"
+#include "PipelineBuilderBase.h"
 
 #include "Utils.h"
 
 using namespace VKQuick;
+
+std::string VKQuick::shaderFolderRoot = "";
 
 Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 {
@@ -20,6 +23,8 @@ Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
 
 	m_vkInit = vkInitInfo;
+
+	VKQuick::shaderFolderRoot = vkInitInfo.shaderRoot;
 
 	for (uint32_t i = 0; i < CommandType::MAX_COMMAND_TYPES; ++i) {
 		m_queueFamilies[i] = -1;

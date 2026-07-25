@@ -19,7 +19,7 @@ namespace VKQuick {
 	//};
 	//				
 	//struct BLASEntry {
-	//	VulkanBuffer buffer;
+	//	VKQuick::Buffer buffer;
 	//	vk::AccelerationStructureBuildGeometryInfoKHR	buildInfo;
 	//	vk::AccelerationStructureBuildSizesInfoKHR		sizeInfo;
 	//	vk::UniqueAccelerationStructureKHR				accelStructure;
@@ -63,6 +63,6 @@ namespace VKQuick {
 	//	VulkanMemoryManager* m_memoryManager;
 
 	//	vk::UniqueAccelerationStructureKHR	m_tlas;
-	//	VulkanBuffer						m_tlasBuffer;
+	//	VKQuick::Buffer						m_tlasBuffer;
 	//};
 }

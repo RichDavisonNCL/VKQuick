@@ -14,7 +14,7 @@ ComputePipelineBuilder::ComputePipelineBuilder(vk::Device device) : PipelineBuil
 }
 
 ComputePipelineBuilder& ComputePipelineBuilder::WithShaderBinary(const std::string& filename, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(filename, vk::ShaderStageFlagBits::eCompute, m_sourceDevice));
+	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(VKQuick::shaderFolderRoot + filename, vk::ShaderStageFlagBits::eCompute, m_sourceDevice));
 	m_usedModules.push_back(m_loadedShaderModules.back().get());
 	m_entryPoint	= entrypoint;
 	return *this;

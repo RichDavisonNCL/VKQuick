@@ -131,6 +131,10 @@ namespace VKQuick {
 			m_pipelineCreate.setLayout(*output.layout);
 		}
 
+		static void SetShaderFolderRoot(const std::string& root) {
+			shaderFolderRoot = root;
+		}
+
 	protected:
 		P m_pipelineCreate;
 		vk::PipelineLayout	m_layout;

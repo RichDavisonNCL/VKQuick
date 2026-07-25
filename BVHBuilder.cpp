@@ -146,7 +146,7 @@ using namespace VKQuick;
 //		scratchSize  = std::max(scratchSize, i.sizeInfo.buildScratchSize);
 //	}
 //
-//	VulkanBuffer scratchBuffer = m_memoryManager->CreateBuffer(
+//	VKQuick::Buffer scratchBuffer = m_memoryManager->CreateBuffer(
 //		{
 //			.size	= scratchSize,
 //			.usage	= vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
@@ -246,7 +246,7 @@ using namespace VKQuick;
 //
 //	size_t dataSize = instanceCount * sizeof(vk::AccelerationStructureInstanceKHR);
 //
-//	VulkanBuffer instanceBuffer = m_memoryManager->CreateBuffer(
+//	VKQuick::Buffer instanceBuffer = m_memoryManager->CreateBuffer(
 //		{
 //			.size  = dataSize,
 //			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress | 
@@ -292,7 +292,7 @@ using namespace VKQuick;
 //	
 //	m_tlas = m_device.createAccelerationStructureKHRUnique(tlasCreateInfo);
 //
-//	VulkanBuffer scratchBuffer = m_memoryManager->CreateBuffer(
+//	VKQuick::Buffer scratchBuffer = m_memoryManager->CreateBuffer(
 //		{
 //				.size	= sizesInfo.buildScratchSize,
 //				.usage	=	vk::BufferUsageFlagBits::eShaderDeviceAddress |

@@ -10,6 +10,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 namespace VKQuick {
 	extern vk::detail::DynamicLoader dynamicLoader;
 
+	extern std::string shaderFolderRoot;
+
 	bool MessageAssert(bool condition, const char* msg);
 
 	template <typename T>

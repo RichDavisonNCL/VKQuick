@@ -88,6 +88,8 @@ namespace VKQuick {
 
 		std::string applicationName = "VKQuick Application";
 
+		std::string shaderRoot = "";
+
 		std::vector<void*>			features;
 
 		std::vector<const char*>	instanceExtensions;
@@ -96,9 +98,8 @@ namespace VKQuick {
 		std::vector<const char*>	deviceExtensions;	
 		std::vector<const char*>	deviceLayers;
 
-
-		uint32_t	initialWidth;
-		uint32_t	initialHeight;
+		uint32_t	initialWidth	= 0;
+		uint32_t	initialHeight	= 0;
 
 #ifdef _WIN32
 		HWND		win32Handle;

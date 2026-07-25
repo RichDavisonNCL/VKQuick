@@ -25,6 +25,22 @@ namespace VKQuick {
 	public:
 		~Texture();
 
+		Texture(Texture& other) {
+			m_createInfo = other.m_createInfo;
+
+			m_defaultView.swap(other.m_defaultView);
+			m_image = other.m_image;
+
+			m_aspectType = other.m_aspectType;
+
+			m_workSemaphore.swap(other.m_workSemaphore);
+
+			m_memManager = other.m_memManager;
+
+			other.m_memManager = nullptr;
+			other.m_image = VK_NULL_HANDLE;
+		}
+
 		vk::ImageView GetDefaultView() const {
 			return *m_defaultView;
 		}
