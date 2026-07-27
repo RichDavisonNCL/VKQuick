@@ -10,8 +10,6 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "MemoryManager.h"
 #include "Pipeline.h"
 
-using std::string;
-
 namespace VKQuick {
 	namespace CommandType {
 		enum Type : uint32_t {
@@ -46,6 +44,7 @@ namespace VKQuick {
 		uint32_t			frameID = 0;
 		uint32_t			cycleID = 0;
 		uint64_t			waitID	= 0;
+
 #define USEDEVICESIGNATURE
 #define USEDEVICEPARAMETER
 #define USEDEVICENAMESPACE
@@ -143,8 +142,11 @@ namespace VKQuick {
 
 		bool MemoryTypeFromPhysicalDeviceProps(vk::MemoryPropertyFlags requirements, uint32_t type, uint32_t& index);
 
-		void	BeginDefaultRenderPass(vk::CommandBuffer cmds);
-		void	BeginRenderToScreen(vk::CommandBuffer  cmds);
+		void BeginDefaultRenderPass(vk::CommandBuffer cmds);
+		void BeginRenderToScreen(vk::CommandBuffer  cmds);
+
+		void BeginDynamicRendering(vk::CommandBuffer cmdBuffer, const vk::RenderingInfoKHR& renderingInfo);
+
 
 		void BeginFrame();
 		void EndFrame();

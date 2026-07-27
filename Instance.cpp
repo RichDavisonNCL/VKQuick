@@ -902,6 +902,25 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 	VKQuick::SetDebugName(m_device, m_depthView	, "DepthBuffer");
 }
 
+void Instance::BeginDynamicRendering(vk::CommandBuffer cmdBuffer, const vk::RenderingInfoKHR& renderingInfo) {
+	cmdBuffer.beginRendering(renderingInfo);
+
+	vk::Extent2D	extent		= renderingInfo.renderArea.extent;
+	vk::Rect2D		scissor		= vk::Rect2D(vk::Offset2D(0, 0), extent);
+
+	vk::Viewport	viewport	= vk::Viewport(0.0f, (float)extent.height, (float)extent.width, -(float)extent.height, 0.0f, 1.0f);
+
+	if (m_vkInit.useOpenGLCoordinates) {
+		viewport = vk::Viewport(0.0f, 0.0f, (float)extent.width, (float)extent.height, 0.0f, 1.0f);
+	}
+	else {
+		viewport = vk::Viewport(0.0f, (float)extent.height, (float)extent.width, -(float)extent.height, 0.0f, 1.0f);
+	}
+
+	cmdBuffer.setViewport(0, 1, &viewport);
+	cmdBuffer.setScissor(0, 1, &scissor);
+}
+
 #define USEDEVICESIGNATURE
 #define USEDEVICEPARAMETER
 #define USEDEVICENAMESPACE VKQuick::FrameContext::
