@@ -145,6 +145,9 @@ namespace VKQuick {
 		void BeginDefaultRenderPass(vk::CommandBuffer cmds);
 		void BeginRenderToScreen(vk::CommandBuffer  cmds);
 
+		[[nodiscard]]
+		class ScopedDynamicRendering BeginScopedRenderToScreen(vk::CommandBuffer  cmds, const std::string& debugName ="");
+
 		void BeginDynamicRendering(vk::CommandBuffer cmdBuffer, const vk::RenderingInfoKHR& renderingInfo);
 
 

@@ -10,7 +10,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "TextureBuilder.h"
 #include "DescriptorSetLayoutBuilder.h"
 #include "PipelineBuilderBase.h"
-
+#include "DynamicRenderBuilder.h"
 #include "Utils.h"
 
 using namespace VKQuick;
@@ -765,33 +765,46 @@ void	Instance::BeginRenderToScreen(vk::CommandBuffer  cmds) {
 	vk::Result waitResult = m_device.waitForFences(m_currentAcquireState->acquireFence, true, ~0);
 	TransitionUndefinedToColour(cmds, m_currentFrameContext->colourImage);
 
-	cmds.setViewport(0, 1, &m_defaultViewport);
-	cmds.setScissor(0, 1, &m_defaultScissor);
+	DynamicRenderBuilder(cmds)
+		.WithColourAttachment({
+			.imageView		= m_currentFrameContext->colourView,
+			.imageLayout	= vk::ImageLayout::eColorAttachmentOptimal,
+			.loadOp			= vk::AttachmentLoadOp::eClear,
+			.storeOp		= vk::AttachmentStoreOp::eStore,
+			.clearValue		= vk::ClearColorValue(0.2f, 0.2f, 0.2f, 1.0f)
+		})
+		.WithDepthAttachment({
+			.imageView		= m_depthView,
+			.imageLayout	= vk::ImageLayout::eDepthAttachmentOptimal,
+			.loadOp			= vk::AttachmentLoadOp::eClear,			
+			.storeOp		= vk::AttachmentStoreOp::eStore,
+			.clearValue		= vk::ClearValue({1.0f}),
+		})
+		.WithRenderArea(m_defaultScissor)
+	.BeginRendering();
+}
 
-	vk::RenderingInfoKHR renderInfo;
+class ScopedDynamicRendering Instance::BeginScopedRenderToScreen(vk::CommandBuffer  cmds, const std::string& debugName) {
+	vk::Result waitResult = m_device.waitForFences(m_currentAcquireState->acquireFence, true, ~0);
+	TransitionUndefinedToColour(cmds, m_currentFrameContext->colourImage);
 
-	vk::RenderingAttachmentInfoKHR colourAttachment;
-	colourAttachment.setImageView(m_currentFrameContext->colourView)
-		.setImageLayout(vk::ImageLayout::eColorAttachmentOptimal)
-		.setLoadOp(vk::AttachmentLoadOp::eClear)
-		.setStoreOp(vk::AttachmentStoreOp::eStore)
-		.setClearValue(vk::ClearColorValue(0.2f, 0.2f, 0.2f, 1.0f));
-
-	vk::RenderingAttachmentInfoKHR depthAttachment;
-	depthAttachment.setImageView(m_depthView)
-		.setImageLayout(vk::ImageLayout::eDepthAttachmentOptimal)
-		.setLoadOp(vk::AttachmentLoadOp::eClear)
-		.setStoreOp(vk::AttachmentStoreOp::eStore)
-		.clearValue.setDepthStencil({ 1.0f, ~0U });
-
-	renderInfo.setColorAttachments(colourAttachment)
-		.setPDepthAttachment(&depthAttachment)
-		.setLayerCount(1)
-		.setRenderArea(m_defaultScreenRect);
-
-	cmds.beginRendering(renderInfo);
-	cmds.setViewport(0, 1, &m_defaultViewport);
-	cmds.setScissor( 0, 1, &m_defaultScissor);
+	return DynamicRenderBuilder(cmds)
+		.WithColourAttachment({
+			.imageView		= m_currentFrameContext->colourView,
+			.imageLayout	= vk::ImageLayout::eColorAttachmentOptimal,
+			.loadOp			= vk::AttachmentLoadOp::eClear,
+			.storeOp		= vk::AttachmentStoreOp::eStore,
+			.clearValue		= vk::ClearColorValue(0.2f, 0.2f, 0.2f, 1.0f)
+		})
+		.WithDepthAttachment({
+			.imageView		= m_depthView,
+			.imageLayout	= vk::ImageLayout::eDepthAttachmentOptimal,
+			.loadOp			= vk::AttachmentLoadOp::eClear,
+			.storeOp		= vk::AttachmentStoreOp::eStore,
+			.clearValue		= vk::ClearValue({1.0f}),
+		})
+		.WithRenderArea(m_defaultScissor)
+	.BeginScopedRendering(debugName);
 }
 
 VkBool32 Instance::DebugCallbackFunction(
@@ -892,9 +905,9 @@ void	Instance::CreateDepthBufer(uint32_t width, uint32_t height) {
 	VKQuick::CmdBufferSubmit(
 		{
 			.buffer = *tempBuffer,
-			.queue = m_queues[CommandType::Graphics],
+			.queue	= m_queues[CommandType::Graphics],
 			.device = m_device,
-			.wait = true
+			.wait	= true
 		}
 	);
 
