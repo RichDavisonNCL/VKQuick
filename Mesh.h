@@ -20,13 +20,8 @@ namespace VKQuick {
 	class Mesh {
 		friend class MeshBuilder;
 	public:
-		Mesh();
 
-		Mesh(std::vector<vk::VertexInputAttributeDescription> attributes, std::vector<vk::VertexInputBindingDescription> bindings);
 		~Mesh();
-
-		Mesh(Mesh& other) {
-		}
 
 		const vk::PipelineVertexInputStateCreateInfo& GetVertexInputState() const {
 			return m_vertexInputState;
@@ -54,11 +49,13 @@ namespace VKQuick {
 
 		const VKQuick::Buffer& GetBuffer() const;
 
-	private:
+	private:		
+		Mesh();
 		vk::PipelineVertexInputStateCreateInfo				m_vertexInputState;
 
 		vk::IndexType	m_indexType	= vk::IndexType::eNoneKHR;
 
+		//Eventually this will support a multi-buffer solution...
 		VKQuick::Buffer	m_gpuBuffer;
 		VKQuick::Buffer m_stagingBuffer;
 
@@ -73,9 +70,7 @@ namespace VKQuick {
 
 		bool		m_hostVisibleBuffers = false;
 
-
 		std::vector<vk::Buffer>					m_usedBuffers;
-
 		std::vector<vk::DeviceSize>				m_usedOffsets;
 		
 		std::vector<vk::VertexInputAttributeDescription>	m_attributeDescriptions;

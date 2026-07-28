@@ -12,11 +12,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 using namespace VKQuick;
 
 Mesh::Mesh() {
-
 }
 
 Mesh::~Mesh() {
-
 }
 
 bool Mesh::GeAttributeData(uint32_t index, uint32_t& offset, size_t& size, vk::Format& format, size_t& stride) {
