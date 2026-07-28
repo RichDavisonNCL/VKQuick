@@ -28,18 +28,34 @@ MeshBuilder::MeshBuilder(vk::Device inDevice, MemoryManager& memManager) {
 }
 
 MeshBuilder& MeshBuilder::WithVertexCount(uint32_t count) {
-    m_vertCount = count;
+    m_mesh->m_vertCount = count;
     return *this;
 }
 
 MeshBuilder& MeshBuilder::WithIndexCount(uint32_t count, vk::IndexType type) {
-    m_indexCount        = count;
-    m_mesh->m_indexType = type;
+    m_mesh->m_indexCount    = count;
+    m_mesh->m_indexType     = type;
     return *this;
 }
 
 MeshBuilder& MeshBuilder::WithBufferUsageFlags(vk::BufferUsageFlags flags) {
     m_usageFlags = flags;
+    return *this;
+}
+
+MeshBuilder& MeshBuilder::WithMeshRange(int start, int vertCount, int baseVertex) {
+    MeshRange r;
+    r.start = start;
+    r.count = vertCount;
+    r.base  = baseVertex;
+
+    m_mesh->m_meshRanges.push_back(r);
+
+    return *this;
+}
+
+MeshBuilder& MeshBuilder::WithPositionAttributeIndex(uint32_t index) {
+    m_mesh->m_positionAttribIndex = index;
     return *this;
 }
 
@@ -78,7 +94,7 @@ UniqueMesh MeshBuilder::Build() {
         vk::VertexInputAttributeDescription&    attribute    = m_mesh->m_attributeDescriptions[i];
         vk::VertexInputBindingDescription&      binding      = m_mesh->m_attributeBindings[i];
 
-        size_t attributeSize = m_vertCount * binding.stride;
+        size_t attributeSize = m_mesh->m_vertCount * binding.stride;
 
         attribAllocations.push_back(attributeSize);
 
@@ -86,10 +102,10 @@ UniqueMesh MeshBuilder::Build() {
         bufferSize += attributeSize;
     }
 
-    if (m_indexCount > 0) {
+    if (m_mesh->m_indexCount > 0) {
         m_mesh->m_indexDataOffset = bufferSize;
 
-        bufferSize += m_indexCount * GetIndexSize(m_mesh->m_indexType);
+        bufferSize += m_mesh->m_indexCount * GetIndexSize(m_mesh->m_indexType);
     }
 
     vk::MemoryPropertyFlags	bufferFlags = vk::MemoryPropertyFlagBits::eDeviceLocal;
@@ -123,7 +139,7 @@ UniqueMesh MeshBuilder::Build() {
     m_mesh->m_vertexDataOffset  = 0;
 
     m_mesh->m_reservedAttributeSizes    = attribAllocations;
-    m_mesh->m_reservedIndexSize         = m_indexCount * GetIndexSize(m_mesh->m_indexType);
+    m_mesh->m_reservedIndexSize         = m_mesh->m_indexCount * GetIndexSize(m_mesh->m_indexType);
 
     m_mesh->m_vertexInputState = vk::PipelineVertexInputStateCreateInfo(
 		{

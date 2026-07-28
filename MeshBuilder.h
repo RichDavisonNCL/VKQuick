@@ -25,7 +25,11 @@ namespace VKQuick {
 
 		MeshBuilder& WithHostVisibleBuffers();
 
+		MeshBuilder& WithMeshRange(int start, int vertCount, int baseVertex);
+
 		MeshBuilder& WithVertexAttribute(uint32_t index, vk::Format format, size_t stride, vk::VertexInputRate rate = vk::VertexInputRate::eVertex);
+
+		MeshBuilder& WithPositionAttributeIndex(uint32_t index);
 
 		UniqueMesh Build();
 
@@ -38,8 +42,5 @@ namespace VKQuick {
 		vk::CommandBuffer		m_cmdBuffer;
 
 		vk::BufferUsageFlags	m_usageFlags;
-
-		uint32_t				m_vertCount				= 0;
-		uint32_t				m_indexCount			= 0;
 	};
 }

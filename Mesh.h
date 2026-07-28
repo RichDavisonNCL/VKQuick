@@ -11,6 +11,12 @@ License: MIT (see LICENSE file at the top of the source tree)
 namespace VKQuick {
 	class MemoryManager;
 
+	struct MeshRange {
+		int start	= 0;
+		int count	= 0;
+		int base	= 0;
+	};
+
 	class Mesh {
 		friend class MeshBuilder;
 	public:
@@ -27,17 +33,26 @@ namespace VKQuick {
 		}		
 		
 		void BindToCommandBuffer(vk::CommandBuffer  buffer) const;
+		void DrawBuffers(vk::CommandBuffer  to, uint32_t instanceCount = 1);
+		void DrawLayer(uint32_t layer, vk::CommandBuffer  to, uint32_t instanceCount = 1);
+		void Draw(vk::CommandBuffer  to, uint32_t instanceCount = 1);
 
-		bool GetOffsetForAttribute(uint32_t index, uint32_t& offset, size_t& size);
-		bool GetOffsetForIndices(uint32_t& offset, size_t& size);
+		bool GeAttributeData(uint32_t index, uint32_t& offset, size_t& size, vk::Format& format, size_t& stride);
+		bool GetIndexData(uint32_t& offset, size_t& size, vk::IndexType& type);
 
 		bool IsHostVisibleBuffer() const;
 
-		//void WriteAttribute(int i, void* data, size_t dataSize, size_t offset = 0);
-		//void WriteIndices(void* data, size_t dataSize, size_t offset = 0);
-
 		void*	MapData();
 		void	UnmapData(vk::CommandBuffer  cmdBuffer);
+
+		const std::vector<MeshRange>& GetRanges() const;
+
+		size_t GetVertexCount() const;
+		size_t GetIndexCount()  const;
+
+		size_t GetPositionAttributeIndex() const;
+
+		const VKQuick::Buffer& GetBuffer() const;
 
 	private:
 		vk::PipelineVertexInputStateCreateInfo				m_vertexInputState;
@@ -52,15 +67,22 @@ namespace VKQuick {
 		size_t		m_allocationSize	= 0;
 		size_t		m_vertexDataOffset	= 0;
 		size_t		m_indexDataOffset	= 0;
+		size_t		m_vertCount			= 0;
+		size_t		m_indexCount		= 0;
+		size_t		m_positionAttribIndex = 0;
 
 		bool		m_hostVisibleBuffers = false;
 
+
 		std::vector<vk::Buffer>					m_usedBuffers;
+
 		std::vector<vk::DeviceSize>				m_usedOffsets;
 		
 		std::vector<vk::VertexInputAttributeDescription>	m_attributeDescriptions;
 		std::vector<vk::VertexInputBindingDescription>		m_attributeBindings;
 
+		std::vector<MeshRange>		m_meshRanges;
+		
 		std::vector<size_t>	m_reservedAttributeSizes;
 		size_t m_reservedIndexSize = 0;
 	};
