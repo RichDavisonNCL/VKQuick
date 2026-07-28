@@ -1,21 +1,32 @@
-/******************************************************************************
-This file is part of the VKQuick library
-
-Author:Rich Davison
-Contact:richgdavison@gmail.com
-License: MIT (see LICENSE file at the top of the source tree)
-*//////////////////////////////////////////////////////////////////////////////
-#include "BVHBuilder.h"
-//#include "VulkanMesh.h"
-#include "Utils.h"
-
-using namespace VKQuick;
-
-//VulkanBVHBuilder::VulkanBVHBuilder() {
+///******************************************************************************
+//This file is part of the VKQuick library
 //
+//Author:Rich Davison
+//Contact:richgdavison@gmail.com
+//License: MIT (see LICENSE file at the top of the source tree)
+//*//////////////////////////////////////////////////////////////////////////////
+//#include "BVHBuilder.h"
+////#include "VulkanMesh.h"
+//#include "Utils.h"
+//
+//using namespace VKQuick;
+//
+//VulkanBVHBuilder::VulkanBVHBuilder(vk::Device inDevice, VKQuick::MemoryManager* inAllocator) {
+//	m_device		= inDevice;
+//	m_memoryManager = inAllocator;
 //}
 //
 //VulkanBVHBuilder::~VulkanBVHBuilder() {
+//}
+//
+//VulkanBVHBuilder& VulkanBVHBuilder::WithCommandQueue(vk::Queue inQueue) {
+//	m_queue = inQueue;
+//	return *this;
+//}
+//
+//VulkanBVHBuilder& VulkanBVHBuilder::WithCommandPool(vk::CommandPool inPool) {
+//	m_pool = inPool;
+//	return *this;
 //}
 //
 //VulkanBVHBuilder& VulkanBVHBuilder::WithObject(VulkanMesh* m, const Matrix4& transform, uint32_t mask, uint32_t hitID) {
@@ -43,25 +54,6 @@ using namespace VKQuick;
 //	return *this;
 //}
 //
-//VulkanBVHBuilder& VulkanBVHBuilder::WithCommandQueue(vk::Queue inQueue) {
-//	m_queue = inQueue;
-//	return *this;
-//}
-//
-//VulkanBVHBuilder& VulkanBVHBuilder::WithCommandPool(vk::CommandPool inPool) {
-//	m_pool = inPool;
-//	return *this;
-//}
-//
-//VulkanBVHBuilder& VulkanBVHBuilder::WithDevice(vk::Device inDevice) {
-//	m_device = inDevice;
-//	return *this;
-//}
-//
-//VulkanBVHBuilder& VulkanBVHBuilder::WithAllocator(VulkanMemoryManager& memoryManager) {
-//	m_memoryManager = &memoryManager;
-//	return *this;
-//}
 //
 //vk::UniqueAccelerationStructureKHR VulkanBVHBuilder::Build(vk::BuildAccelerationStructureFlagsKHR inFlags, const std::string& debugName) {
 //	BuildBLAS(inFlags);
@@ -319,9 +311,9 @@ using namespace VKQuick;
 //	VKQuick::CmdBufferSubmit(
 //		{
 //			.buffer = *cmdBuffer,
-//			.queue = m_queue,
+//			.queue	= m_queue,
 //			.device = m_device,
-//			.wait = true
+//			.wait	= true
 //		}
 //	);
 //}
