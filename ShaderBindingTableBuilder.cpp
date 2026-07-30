@@ -10,8 +10,9 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 using namespace VKQuick;
 
-ShaderBindingTableBuilder::ShaderBindingTableBuilder(const std::string& inDebugName) {
-	debugName = debugName;
+ShaderBindingTableBuilder::ShaderBindingTableBuilder(vk::Device device, MemoryManager& memManager) {
+	m_sourceDevice	= device;
+	m_memManager	= &memManager;
 }
 
 ShaderBindingTableBuilder& ShaderBindingTableBuilder::WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR deviceProps) {
@@ -62,7 +63,7 @@ int MakeMultipleOf(int input, int multiple) {
 	return count * multiple;
 }
 
-ShaderBindingTable ShaderBindingTableBuilder::Build(vk::Device device, MemoryManager& memManager) {
+ShaderBindingTable ShaderBindingTableBuilder::Build(const std::string& debugName) {
 	assert(pipeCreateInfo);
 	assert(pipeline);
 
@@ -81,7 +82,7 @@ ShaderBindingTable ShaderBindingTableBuilder::Build(vk::Device device, MemoryMan
 	uint32_t totalHandleSize	= numShaderGroups * handleSize;
 
 	std::vector<uint8_t> handles(totalHandleSize);
-	auto result = device.getRayTracingShaderGroupHandlesKHR(pipeline, 0, numShaderGroups, totalHandleSize, handles.data());
+	auto result = m_sourceDevice.getRayTracingShaderGroupHandlesKHR(pipeline, 0, numShaderGroups, totalHandleSize, handles.data());
 
 	uint32_t bufferSize = 0;
 
@@ -92,7 +93,7 @@ ShaderBindingTable ShaderBindingTableBuilder::Build(vk::Device device, MemoryMan
 	}
 	table.regions[0].stride = table.regions[0].size;
 
-	table.tableBuffer = memManager.CreateBuffer(
+	table.tableBuffer = m_memManager->CreateBuffer(
 		{
 			.size = bufferSize,
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress		|
@@ -105,7 +106,7 @@ ShaderBindingTable ShaderBindingTableBuilder::Build(vk::Device device, MemoryMan
 	);
 
 
-	vk::DeviceAddress bufferAddress = device.getBufferAddress({ .buffer = table.tableBuffer.buffer });
+	vk::DeviceAddress bufferAddress = m_sourceDevice.getBufferAddress({ .buffer = table.tableBuffer.buffer });
 
 	char* bufferData = (char*)table.tableBuffer.Map();
 	int dataOffset = 0;

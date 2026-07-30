@@ -19,8 +19,7 @@ std::string VKQuick::shaderFolderRoot = "";
 
 Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 {
-	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = VKQuick::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr");
-	VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
+	VULKAN_HPP_DEFAULT_DISPATCHER.init(VKQuick::dynamicLoader.getProcAddress<PFN_vkGetInstanceProcAddr>("vkGetInstanceProcAddr"));
 
 	m_vkInit = vkInitInfo;
 

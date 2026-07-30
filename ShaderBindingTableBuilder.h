@@ -28,7 +28,7 @@ namespace VKQuick {
 
 	class ShaderBindingTableBuilder {
 	public:
-		ShaderBindingTableBuilder(const std::string& debugName = "");
+		ShaderBindingTableBuilder(vk::Device device, MemoryManager& memManager);
 		~ShaderBindingTableBuilder() = default;
 
 		ShaderBindingTableBuilder& WithProperties(vk::PhysicalDeviceRayTracingPipelinePropertiesKHR properties);
@@ -37,10 +37,13 @@ namespace VKQuick {
 
 		ShaderBindingTableBuilder& WithLibrary(const vk::RayTracingPipelineCreateInfoKHR& createInfo);
 
-		ShaderBindingTable Build(vk::Device device, MemoryManager& memManager);
+		ShaderBindingTable Build(const std::string& debugName = "");
 
 	protected:
 		void FillCounts(const vk::RayTracingPipelineCreateInfoKHR* fromInfo);
+
+		vk::Device		m_sourceDevice;
+		MemoryManager*	m_memManager;
 
 		vk::PhysicalDeviceRayTracingPipelinePropertiesKHR properties;
 
@@ -49,8 +52,6 @@ namespace VKQuick {
 		std::vector<const vk::RayTracingPipelineCreateInfoKHR*> libraries;
 
 		vk::Pipeline pipeline;
-
-		std::string debugName;
 
 		uint32_t handleCounts[BindingTableOrder::MAX_SIZE] = { };
 	};
