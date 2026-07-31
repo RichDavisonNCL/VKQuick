@@ -34,8 +34,8 @@ namespace VKQuick {
 		DescriptorBufferWriter& WriteBuffer(uint32_t binding, vk::DescriptorType type, const Buffer& buffer, uint32_t arrayIndex = 0)
 		{
 			vk::DescriptorAddressInfoEXT descriptorAddress{
-				.address	= buffer.deviceAddress,
-				.range		= buffer.size
+				.address	= buffer.GetDeviceAddress(),
+				.range		= buffer.GetSize()
 			};
 
 			vk::DescriptorGetInfoEXT getInfo{

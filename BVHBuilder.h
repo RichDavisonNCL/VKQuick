@@ -32,7 +32,7 @@ namespace VKQuick {
 
 	class BVHBuilder	{
 	public:
-		BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager* inAllocator);
+		BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager& inAllocator);
 		~BVHBuilder();
 
 		BVHBuilder& WithObject(VKQuick::Mesh* m, const vk::TransformMatrixKHR& transform, uint32_t mask = ~0, uint32_t hitID = 0);
@@ -40,7 +40,9 @@ namespace VKQuick {
 		BVHBuilder& WithCommandQueue(vk::Queue inQueue);
 		BVHBuilder& WithCommandPool(vk::CommandPool inPool);
 
-		vk::UniqueAccelerationStructureKHR Build(vk::BuildAccelerationStructureFlagsKHR flags, const std::string& debugName = "");
+		BVHBuilder& WithFlags(vk::BuildAccelerationStructureFlagsKHR flags);
+
+		vk::UniqueAccelerationStructureKHR Build(const std::string& debugName = "");
 	protected:
 
 		void BuildBLAS(vk::BuildAccelerationStructureFlagsKHR flags);
@@ -60,7 +62,7 @@ namespace VKQuick {
 		vk::CommandPool m_pool;
 		vk::Device		m_device;
 
-		VKQuick::MemoryManager* m_memoryManager;
+		VKQuick::MemoryManager& m_memoryManager;
 
 		vk::UniqueAccelerationStructureKHR	m_tlas;
 		VKQuick::Buffer						m_tlasBuffer;

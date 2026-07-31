@@ -57,9 +57,9 @@ Buffer VMAMemoryManager::CreateBuffer(vk::BufferCreateInfo createInfo, vk::Memor
 	SetBufferID(newBuffer, id);
 
 	size_t allocSize = createInfo.size;
+
+	SetBufferSize(newBuffer, allocSize);
 	
-	newBuffer.size = allocSize;
-		
 	VmaAllocationCreateInfo allocCreateInfo = {};
 	allocCreateInfo.usage = VMA_MEMORY_USAGE_AUTO;
 	
@@ -82,21 +82,21 @@ Buffer VMAMemoryManager::CreateBuffer(vk::BufferCreateInfo createInfo, vk::Memor
 
 	Allocation allocation;
 	
-	vmaCreateBuffer(m_memoryAllocator, (VkBufferCreateInfo*)&createInfo, &allocCreateInfo, (VkBuffer*)&(newBuffer.buffer), &allocation.m_allocationHandle, &allocation.m_allocationInfo);
+	vmaCreateBuffer(m_memoryAllocator, (VkBufferCreateInfo*)&createInfo, &allocCreateInfo, (VkBuffer*) & GetBufferHandle(newBuffer), &allocation.m_allocationHandle, &allocation.m_allocationInfo);
 	
 	if (createInfo.usage & vk::BufferUsageFlagBits::eShaderDeviceAddress) {
 
 		vk::Device d = m_allocatorInfo.device;
 
-		newBuffer.deviceAddress = d.getBufferAddress(
-			{		
-				.buffer = newBuffer.buffer
+		SetBufferAddress(newBuffer, d.getBufferAddress(
+			{
+				.buffer = newBuffer
 			}
-		);
+		));
 	}
 	
 	if (!debugName.empty()) {
-		SetDebugName(m_allocatorInfo.device,newBuffer.buffer, debugName);
+		SetDebugName(m_allocatorInfo.device, GetBufferHandle(newBuffer), debugName);
 	}
 
 	m_bufferAllocations[id] = allocation;
@@ -227,13 +227,11 @@ void	VMAMemoryManager::DeleteBuffer(Buffer& buffer) {
 		return;
 	}
 
-	vmaDestroyBuffer(m_memoryAllocator, buffer.buffer, m_bufferAllocations[id].m_allocationHandle);
+	vmaDestroyBuffer(m_memoryAllocator, GetBufferHandle(buffer), m_bufferAllocations[id].m_allocationHandle);
 	m_spareBufferIDs.push_back(id);
 
 	m_bufferAllocations[id].m_allocationHandle = 0;
 	m_bufferAllocations[id].m_allocationInfo = {};
 
-	buffer.buffer			= VK_NULL_HANDLE;
-	buffer.size				= 0;
-	buffer.deviceAddress	= 0;
+	ClearBuffer(buffer);
 }

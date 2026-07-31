@@ -8,8 +8,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "TextureBuilder.h"
 #include "Texture.h"
 #include "Utils.h"
-//#include "TextureLoader.h"
-//
+
 using namespace VKQuick;
 
 TextureLoadFunction			TextureBuilder::s_loadFunction{};

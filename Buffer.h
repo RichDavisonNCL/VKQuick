@@ -18,11 +18,6 @@ namespace VKQuick {
 		virtual ~Buffer();
 		Buffer& operator=(Buffer&& obj);
 
-		vk::Buffer	buffer;
-		size_t		size = 0;
-
-		vk::DeviceAddress	deviceAddress;
-
 		//A convenience func to help get around vma holding various
 		//mapped pointers etc, so us calling mapBuffer can cause
 		//validation errors
@@ -37,9 +32,21 @@ namespace VKQuick {
 			return static_cast<T*>(data);
 		}
 
-		//Convenience function so we can use this struct in place of a vkBuffer when necessary
+		//Convenience function so we can use this class in place of a vkBuffer when necessary
 		operator vk::Buffer() const {
 			return buffer;
+		}
+
+		vk::Buffer GetHandle() const {
+			return buffer;
+		}
+
+		vk::DeviceAddress GetDeviceAddress() const {
+			return deviceAddress;
+		}
+
+		size_t GetSize() const {
+			return size;
 		}
 
 	protected:
@@ -54,6 +61,11 @@ namespace VKQuick {
 		MemoryManager* m_sourceManager = nullptr;
 
 		uint32_t m_bufferID;
+
+		vk::Buffer	buffer;
+		size_t		size = 0;
+
+		vk::DeviceAddress	deviceAddress;
 	};
 
 	using UniqueBuffer = std::unique_ptr<Buffer>;

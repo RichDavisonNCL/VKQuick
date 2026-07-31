@@ -127,7 +127,7 @@ UniqueMesh MeshBuilder::Build() {
     );
 
     for (int i = 0; i < m_mesh->m_attributeDescriptions.size(); ++i) {
-        m_mesh->m_usedBuffers.push_back(m_mesh->m_gpuBuffer.buffer);
+        m_mesh->m_usedBuffers.push_back(m_mesh->m_gpuBuffer);
 
         m_mesh->m_usedOffsets.push_back(m_mesh->m_attributeDescriptions[i].offset); //TODO ???
         m_mesh->m_attributeDescriptions[i].offset = 0;

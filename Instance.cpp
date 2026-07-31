@@ -11,7 +11,15 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "DescriptorSetLayoutBuilder.h"
 #include "PipelineBuilderBase.h"
 #include "DynamicRenderBuilder.h"
+
+#include "PipelineBuilder.h"
+#include "ComputePipelineBuilder.h"
+#include "RayTracingPipelineBuilder.h"
+
+#include "BVHBuilder.h"
+#include "DescriptorSetBuilder.h"
 #include "Utils.h"
+#include "VMAMemoryManager.h"
 
 using namespace VKQuick;
 
@@ -55,10 +63,18 @@ Instance::Instance(const VKQuickInitialisation& vkInitInfo)
 		.pNext = &typeCreateInfo,
 	};
 	m_flightSempaphore = m_device.createSemaphore(createInfo);
+
+	if (m_vkInit.memoryManagerCreationFunction) {
+		m_memoryManager = m_vkInit.memoryManagerCreationFunction(*this);
+	}
+
+	m_memoryManager = new VKQuick::VMAMemoryManager(m_device, m_physicalDevice, m_instance, m_vkInit);
 }
 
 Instance::~Instance() {
 	m_device.waitIdle();
+
+	delete m_memoryManager;
 
 	for(ChainState & c : m_swapStates) {
 		m_device.destroyFramebuffer(c.frameBuffer);
@@ -286,8 +302,6 @@ void	Instance::InitFrameStates(uint32_t m_framesInFlight) {
 		context.depthImage			= m_depthImage;
 		context.depthView			= m_depthView;;
 		context.depthFormat			= m_vkInit.depthStencilFormat;
-
-
 
 		for (int i = 0; i < CommandType::Type::MAX_COMMAND_TYPES; ++i) {
 			context.commandPools[i]		= m_commandPools[i];
@@ -559,6 +573,8 @@ void	Instance::BeginFrame() {
 			}
 		);
 	}
+
+	m_memoryManager->Update();
 
 	//First we need to prevent the m_renderer from going too far ahead of the frames in flight max
 	m_currentFrameContextID = (m_currentFrameContextID + 1) % m_frameContexts.size();
@@ -931,6 +947,35 @@ void Instance::BeginDynamicRendering(vk::CommandBuffer cmdBuffer, const vk::Rend
 
 	cmdBuffer.setViewport(0, 1, &viewport);
 	cmdBuffer.setScissor(0, 1, &scissor);
+}
+
+//Builder shortcuts
+class BVHBuilder	Instance::BVHBuilder() {
+	return VKQuick::BVHBuilder(m_device, *m_memoryManager);
+}
+
+DescriptorSetBuilder	Instance::DescriptorSetBuilder(vk::DescriptorPool pool, vk::DescriptorSetLayout layout) {
+	return VKQuick::DescriptorSetBuilder(m_device, pool, layout);
+}
+
+DescriptorSetLayoutBuilder	Instance::DescriptorSetLayoutBuilder() {
+	return VKQuick::DescriptorSetLayoutBuilder(m_device);
+}
+
+TextureBuilder Instance::TextureBuilder() {
+	return VKQuick::TextureBuilder(m_device, *m_memoryManager);
+}
+
+PipelineBuilder	Instance::PipelineBuilder() {
+	return VKQuick::PipelineBuilder(m_device);
+}
+
+ComputePipelineBuilder Instance::ComputePipelineBuilder() {
+	return VKQuick::ComputePipelineBuilder(m_device);
+}
+
+RayTracingPipelineBuilder Instance::RayTracingPipelineBuilder() {
+	return VKQuick::RayTracingPipelineBuilder(m_device, m_physicalDevice, *m_memoryManager);
 }
 
 #define USEDEVICESIGNATURE

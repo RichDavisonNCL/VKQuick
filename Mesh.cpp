@@ -86,9 +86,9 @@ void  Mesh::UnmapData(vk::CommandBuffer  cmdBuffer) {
 		//Copy it over now!
 
 		vk::BufferCopy copyRegion;
-		copyRegion.size = m_gpuBuffer.size;
+		copyRegion.size = m_gpuBuffer.GetSize();
 
-		cmdBuffer.copyBuffer(m_stagingBuffer.buffer, m_gpuBuffer.buffer, copyRegion);
+		cmdBuffer.copyBuffer(m_stagingBuffer, m_gpuBuffer, copyRegion);
 
 		m_memManager->DiscardBuffer(m_stagingBuffer);
 	}
@@ -98,7 +98,7 @@ void Mesh::BindToCommandBuffer(vk::CommandBuffer  buffer) const {
 	buffer.bindVertexBuffers(0, m_usedBuffers.size(), &m_usedBuffers[0], &m_usedOffsets[0]);
 
 	if (m_indexType != vk::IndexType::eNoneKHR) {
-		buffer.bindIndexBuffer(m_gpuBuffer.buffer, m_indexDataOffset, m_indexType);
+		buffer.bindIndexBuffer(m_gpuBuffer, m_indexDataOffset, m_indexType);
 	}
 }
 

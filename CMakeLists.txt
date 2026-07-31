@@ -24,7 +24,6 @@ set(Header_Files
 	"DescriptorBufferWriter.h"
 	"BVHBuilder.h"
 	"RayTracingPipelineBuilder.h"	
-	"ShaderBindingTableBuilder.h"
     "MemoryManager.h"
     "VMAMemoryManager.h"
 )
@@ -46,7 +45,6 @@ set(Source_Files
     "Texture.cpp"
 	"BVHBuilder.cpp"
 	"RayTracingPipelineBuilder.cpp"
-	"ShaderBindingTableBuilder.cpp"	
     "VMAMemoryManager.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})

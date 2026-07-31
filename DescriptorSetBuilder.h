@@ -20,37 +20,37 @@ namespace VKQuick {
 				.descriptorSetCount = 1,
 				.pSetLayouts		= &layout
 			};
-			m_set = device.allocateDescriptorSetsUnique(allocateInfo)[0];
+			m_set = std::move(device.allocateDescriptorSetsUnique(allocateInfo)[0]);
 		}
 		~DescriptorSetBuilder() = default;
 
 		DescriptorSetBuilder& WriteSampler(uint32_t binding, vk::Sampler sampler) {
-			VKQuick::WriteSamplerDescriptor(m_device, m_set, binding, sampler);
+			VKQuick::WriteSamplerDescriptor(m_device, *m_set, binding, sampler);
 			return *this;
 		}
 
 		DescriptorSetBuilder& WriteImage(uint32_t binding, vk::ImageView view, vk::Sampler sampler, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-			VKQuick::WriteCombinedImageDescriptor(m_device, m_set, binding, view, sampler, layout);
+			VKQuick::WriteCombinedImageDescriptor(m_device, *m_set, binding, view, sampler, layout);
 			return *this;
 		}
 
 		DescriptorSetBuilder& WriteImage(uint32_t binding, vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-			VKQuick::WriteImageDescriptor(m_device, m_set, binding, view, layout);
+			VKQuick::WriteImageDescriptor(m_device, *m_set, binding, view, layout);
 			return *this;
 		}
 
 		DescriptorSetBuilder& WriteStorageImage(uint32_t binding, vk::ImageView view, vk::ImageLayout layout = vk::ImageLayout::eShaderReadOnlyOptimal) {
-			VKQuick::WriteStorageImageDescriptor(m_device, m_set, binding, view, layout);
+			VKQuick::WriteStorageImageDescriptor(m_device, *m_set, binding, view, layout);
 			return *this;
 		}
 
 		DescriptorSetBuilder& WriteBuffer(uint32_t binding, vk::Buffer buffer, vk::DescriptorType type, size_t offset = 0, size_t range = VK_WHOLE_SIZE) {
-			VKQuick::WriteBufferDescriptor(m_device, m_set, binding, type, buffer, offset, range);
+			VKQuick::WriteBufferDescriptor(m_device, *m_set, binding, type, buffer, offset, range);
 			return *this;
 		}
 
 		DescriptorSetBuilder& WriteTLAS(uint32_t binding, vk::AccelerationStructureKHR tlas) {
-			VKQuick::WriteTLASDescriptor(m_device, m_set, binding, tlas);
+			VKQuick::WriteTLASDescriptor(m_device, *m_set, binding, tlas);
 			return *this;
 		}
 
@@ -61,6 +61,6 @@ namespace VKQuick {
 	protected:
 		vk::Device				m_device;
 		vk::DescriptorSetLayout	m_layout;
-		vk::DescriptorSet		m_set;
+		vk::UniqueDescriptorSet	m_set;
 	};
 }

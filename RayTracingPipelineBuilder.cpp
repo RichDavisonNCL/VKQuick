@@ -6,12 +6,13 @@ Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 *//////////////////////////////////////////////////////////////////////////////
 #include "RayTracingPipelineBuilder.h"
-
+#include "MemoryManager.h"
 #include "Utils.h"
 
 using namespace VKQuick;
 
-RayTracingPipelineBuilder::RayTracingPipelineBuilder(vk::Device device) : PipelineBuilderBase(device){
+RayTracingPipelineBuilder::RayTracingPipelineBuilder(vk::Device device, vk::PhysicalDevice physicalDevice, MemoryManager& memManager) : PipelineBuilderBase(device), m_memoryManager(memManager){
+	m_physicalDevice = physicalDevice;
 }
 
 RayTracingPipelineBuilder::~RayTracingPipelineBuilder() {
@@ -74,7 +75,6 @@ RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithShaderBinary(const std
 	return *this;
 }
 
-
 RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
 	m_usedModules.push_back(&module);
 	m_moduleEntryPoints.push_back(entrypoint);
@@ -82,8 +82,8 @@ RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithShaderModule(const Sha
 	return *this;
 }
 
-Pipeline RayTracingPipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
-	Pipeline output;
+RayPipeline RayTracingPipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
+	RayPipeline output;
 	
 	FillShaderModules(output);
 	FillShaderLayouts(output);
@@ -105,5 +105,103 @@ Pipeline RayTracingPipelineBuilder::Build(const std::string& debugName, vk::Pipe
 		SetDebugName(m_sourceDevice, *output.layout		, debugName);
 	}
 
+	CreateSBT(output, debugName);
+
 	return output;
+}
+
+void RayTracingPipelineBuilder::FillSBTCounts(const vk::RayTracingPipelineCreateInfoKHR* fromInfo) {
+	for (int i = 0; i < fromInfo->groupCount; ++i) {
+		if (fromInfo->pGroups[i].type == vk::RayTracingShaderGroupTypeKHR::eGeneral) {
+			int shaderType = fromInfo->pGroups[i].generalShader;
+
+			if (fromInfo->pStages[shaderType].stage == vk::ShaderStageFlagBits::eRaygenKHR) {
+				handleCounts[BindingTableOrder::RayGen]++;
+			}
+			else if (fromInfo->pStages[shaderType].stage == vk::ShaderStageFlagBits::eMissKHR) {
+				handleCounts[BindingTableOrder::Miss]++;
+			}
+			else if (fromInfo->pStages[shaderType].stage == vk::ShaderStageFlagBits::eCallableKHR) {
+				handleCounts[BindingTableOrder::Call]++;
+			}
+		}
+		else { //Must be a hit group
+			handleCounts[BindingTableOrder::Hit]++;
+		}
+	}
+}
+
+
+int MakeMultipleOf(int input, int multiple) {
+	int count = input / multiple;
+	int r = input % multiple;
+
+	if (r != 0) {
+		count += 1;
+	}
+
+	return count * multiple;
+}
+
+void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::string& debugName) {
+	FillSBTCounts(&m_pipelineCreate); //Fills the handleIndices vectors
+
+	uint32_t numShaderGroups = m_pipelineCreate.groupCount;
+	//for (auto& i : libraries) {
+	//	numShaderGroups += i->groupCount;
+	//	FillSBTCounts(i);
+	//}
+
+	vk::PhysicalDeviceRayTracingPipelinePropertiesKHR rayPipelineProperties;
+	vk::PhysicalDeviceProperties2 properties;
+	properties.pNext = &rayPipelineProperties;
+	m_physicalDevice.getProperties2(&properties);
+
+	uint32_t handleSize			= rayPipelineProperties.shaderGroupHandleSize;
+	uint32_t alignedHandleSize	= MakeMultipleOf(handleSize, rayPipelineProperties.shaderGroupHandleAlignment);
+	uint32_t totalHandleSize	= numShaderGroups * handleSize;
+
+	std::vector<uint8_t> handles(totalHandleSize);
+	auto result = m_sourceDevice.getRayTracingShaderGroupHandlesKHR(pipeline, 0, numShaderGroups, totalHandleSize, handles.data());
+
+	uint32_t bufferSize = 0;
+
+	for (int i = 0; i < BindingTableOrder::MAX_SIZE; ++i) {
+		pipeline.bindingTable.regions[i].size	= MakeMultipleOf(alignedHandleSize * handleCounts[i], rayPipelineProperties.shaderGroupBaseAlignment);
+		pipeline.bindingTable.regions[i].stride = alignedHandleSize;
+		bufferSize += pipeline.bindingTable.regions[i].size;
+	}
+	pipeline.bindingTable.regions[0].stride = pipeline.bindingTable.regions[0].size;
+
+	pipeline.bindingTable.tableBuffer = m_memoryManager.CreateBuffer(
+		{
+			.size = bufferSize,
+			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress		|
+						vk::BufferUsageFlagBits::eTransferSrc				|
+						vk::BufferUsageFlagBits::eShaderDeviceAddressKHR	|
+						vk::BufferUsageFlagBits::eShaderBindingTableKHR,
+		},
+		vk::MemoryPropertyFlagBits::eHostVisible,
+		debugName + " SBT Buffer"
+	);
+
+
+	vk::DeviceAddress bufferAddress = pipeline.bindingTable.tableBuffer.GetDeviceAddress();
+
+	char* bufferData = (char*)pipeline.bindingTable.tableBuffer.Map();
+	int dataOffset = 0;
+	int currentHandleIndex = 0;
+
+	for (int i = 0; i < BindingTableOrder::MAX_SIZE; ++i) { //For each group type
+		int dataOffsetStart = dataOffset;
+		pipeline.bindingTable.regions[i].deviceAddress = bufferAddress + dataOffsetStart;
+	
+		for (int j = 0; j < handleCounts[i]; ++j) { //For entries in that group
+			memcpy(bufferData + dataOffset, handles.data() + (currentHandleIndex++ * handleSize), handleSize);
+			dataOffset += alignedHandleSize;
+		}
+		dataOffset = dataOffsetStart + pipeline.bindingTable.regions[i].size;
+	}
+
+	pipeline.bindingTable.tableBuffer.Unmap();
 }

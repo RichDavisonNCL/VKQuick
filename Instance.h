@@ -69,12 +69,19 @@ namespace VKQuick {
 		vk::Fence			presentFence;
 	};
 
+	class Instance;
+
+	using MemoryManagerCreateFunction = std::function<MemoryManager*(VKQuick::Instance& instance)>;
+
 	struct VKQuickInitialisation {
 		vk::Format			depthStencilFormat	= vk::Format::eD32SfloatS8Uint;
 		vk::PresentModeKHR  idealPresentMode	= vk::PresentModeKHR::eFifo;
 
 		vk::PhysicalDeviceType idealGPU			= vk::PhysicalDeviceType::eDiscreteGpu;
 
+		MemoryManagerCreateFunction	memoryManagerCreationFunction = nullptr;
+
+		using TextureLoadFunction			= std::function<LoadedTexture(const std::string& filename)>;
 
 		vk::DescriptorPoolCreateFlags	defaultDescriptorPoolFlags = {};
 
@@ -136,6 +143,10 @@ namespace VKQuick {
 			return m_frameContexts[m_currentFrameContextID];
 		}
 
+		MemoryManager& GetMemoryManager() const {
+			return *m_memoryManager;
+		}
+
 		bool SupportsAsyncCompute() const;
 		bool SupportsAsyncCopy()	const;
 		bool SupportsAsyncPresent() const;
@@ -157,6 +168,18 @@ namespace VKQuick {
 
 		void OnWindowResize(int w, int h);
 		void OnWindowMinimise(bool isMinimised);
+
+		//Builder shortcuts
+
+		class BVHBuilder	BVHBuilder();
+
+		class DescriptorSetBuilder	DescriptorSetBuilder(vk::DescriptorPool pool, vk::DescriptorSetLayout layout);
+		class DescriptorSetLayoutBuilder DescriptorSetLayoutBuilder();
+		class TextureBuilder		TextureBuilder();
+
+		class PipelineBuilder	PipelineBuilder();
+		class ComputePipelineBuilder ComputePipelineBuilder();
+		class RayTracingPipelineBuilder RayTracingPipelineBuilder();
 	protected:
 		void	InitDefaultRenderPass();
 		void	InitDefaultDescriptorPool();
@@ -182,6 +205,7 @@ namespace VKQuick {
 		bool	InitDeviceQueueIndices();
 	private:
 		VKQuickInitialisation		m_vkInit;
+		VKQuick::MemoryManager*		m_memoryManager = nullptr;
 
 		vk::Instance				m_instance;			//API Instance
 		vk::PhysicalDevice			m_physicalDevice;	//GPU in use

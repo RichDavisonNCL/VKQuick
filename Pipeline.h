@@ -32,6 +32,5 @@ namespace VKQuick {
 		operator vk::PipelineLayout() const {
 			return *layout;
 		}
-
 	};
 }

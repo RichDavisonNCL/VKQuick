@@ -20,9 +20,8 @@ namespace VKQuick {
 		virtual ~MemoryManager() {};
 
 		virtual Buffer	CreateBuffer(vk::BufferCreateInfo createInfo, vk::MemoryPropertyFlags memoryProperties, const std::string& debugName = "") = 0;
-
-		virtual Buffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")						= 0;
-		virtual void			DiscardBuffer(Buffer& buffer, DiscardMode discard = DiscardMode::Deferred)		= 0;
+		virtual Buffer	CreateStagingBuffer(size_t size, const std::string& debugName = "")				= 0;
+		virtual void	DiscardBuffer(Buffer& buffer, DiscardMode discard = DiscardMode::Deferred)		= 0;
 
 		virtual void*			MapBuffer(const Buffer& buffer)		= 0;
 		virtual void			UnmapBuffer(const Buffer& buffer)	= 0;
@@ -48,6 +47,12 @@ namespace VKQuick {
 			return b;
 		}
 
+		void ClearBuffer(Buffer& b) {
+			b.buffer		= VK_NULL_HANDLE;
+			b.size			= 0;
+			b.deviceAddress = 0;
+		}
+
 		uint32_t GetBufferID(const Buffer& b) const {
 			return b.m_bufferID;
 		}
@@ -56,6 +61,17 @@ namespace VKQuick {
 			b.m_bufferID = id;
 		}
 
+		void	SetBufferSize(Buffer& b, size_t size) {
+			b.size = size;
+		}
+
+		void	SetBufferAddress(Buffer& b, vk::DeviceAddress address) {
+			b.deviceAddress = address;
+		}
+
+		vk::Buffer& GetBufferHandle(Buffer& b) {
+			return b.buffer;
+		}
 
 		std::vector<uint32_t> defaultBufferFamilies;
 		std::vector<uint32_t> defaultImageFamilies;

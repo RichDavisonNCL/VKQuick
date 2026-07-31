@@ -10,9 +10,8 @@
 
 using namespace VKQuick;
 
-BVHBuilder::BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager* inAllocator) {
+BVHBuilder::BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager& inAllocator) : m_memoryManager(inAllocator){
 	m_device		= inDevice;
-	m_memoryManager = inAllocator;
 }
 
 BVHBuilder::~BVHBuilder() {
@@ -25,6 +24,11 @@ BVHBuilder& BVHBuilder::WithCommandQueue(vk::Queue inQueue) {
 
 BVHBuilder& BVHBuilder::WithCommandPool(vk::CommandPool inPool) {
 	m_pool = inPool;
+	return *this;
+}
+
+BVHBuilder& BVHBuilder::WithFlags(vk::BuildAccelerationStructureFlagsKHR flags) {
+	m_flags = flags;
 	return *this;
 }
 
@@ -54,9 +58,9 @@ BVHBuilder& BVHBuilder::WithObject(VKQuick::Mesh* m, const vk::TransformMatrixKH
 }
 
 
-vk::UniqueAccelerationStructureKHR BVHBuilder::Build(vk::BuildAccelerationStructureFlagsKHR inFlags, const std::string& debugName) {
-	BuildBLAS(inFlags);
-	BuildTLAS(inFlags);
+vk::UniqueAccelerationStructureKHR BVHBuilder::Build(const std::string& debugName) {
+	BuildBLAS(m_flags);
+	BuildTLAS(m_flags);
 
 	if (!debugName.empty()) {
 		SetDebugName(m_device, *m_tlas, debugName);
@@ -85,12 +89,12 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 
 		vk::AccelerationStructureGeometryTrianglesDataKHR triData;
 		triData.vertexFormat = vFormat;
-		triData.vertexData.deviceAddress = buffer.deviceAddress + vOffset;
+		triData.vertexData.deviceAddress = buffer.GetDeviceAddress() + vOffset;
 		triData.vertexStride = vStride;
 
 		if (hasIndices) {
 			triData.indexType = iFormat;
-			triData.indexData.deviceAddress = buffer.deviceAddress + iOffset;
+			triData.indexData.deviceAddress = buffer.GetDeviceAddress() + iOffset;
 		}
 
 		triData.maxVertex = i->GetVertexCount();
@@ -146,7 +150,7 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 		scratchSize  = std::max(scratchSize, i.sizeInfo.buildScratchSize);
 	}
 
-	VKQuick::Buffer scratchBuffer = m_memoryManager->CreateBuffer(
+	VKQuick::Buffer scratchBuffer = m_memoryManager.CreateBuffer(
 		{
 			.size	= scratchSize,
 			.usage	= vk::BufferUsageFlagBits::eShaderDeviceAddress | vk::BufferUsageFlagBits::eStorageBuffer,
@@ -162,7 +166,7 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 		createInfo.type = vk::AccelerationStructureTypeKHR::eBottomLevel;
 		createInfo.size = i.sizeInfo.accelerationStructureSize;
 
-		i.buffer = m_memoryManager->CreateBuffer(
+		i.buffer = m_memoryManager.CreateBuffer(
 			{
 				.size	= createInfo.size,
 				.usage	=	vk::BufferUsageFlagBits::eShaderDeviceAddress | 
@@ -172,12 +176,12 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 			"BLAS Buffer"
 		);
 
-		createInfo.buffer = i.buffer.buffer;
+		createInfo.buffer = i.buffer;
 
 		i.accelStructure = m_device.createAccelerationStructureKHRUnique(createInfo);
 
 		i.buildInfo.dstAccelerationStructure	= *i.accelStructure;
-		i.buildInfo.scratchData.deviceAddress	= scratchBuffer.deviceAddress;
+		i.buildInfo.scratchData.deviceAddress	= scratchBuffer.GetDeviceAddress();
 
 		const vk::AccelerationStructureBuildRangeInfoKHR* rangeInfo = i.ranges.data();
 
@@ -221,7 +225,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 
 		tlasEntries[i].instanceCustomIndex = meshID;
 
-		tlasEntries[i].accelerationStructureReference = m_device.getBufferAddress({ .buffer = m_blasBuildInfo[meshID].buffer.buffer });
+		tlasEntries[i].accelerationStructureReference = m_device.getBufferAddress({ .buffer = m_blasBuildInfo[meshID].buffer });
 
 
 		tlasEntries[i].flags = (VkGeometryInstanceFlagBitsKHR)vk::GeometryInstanceFlagBitsKHR::eTriangleFacingCullDisable;
@@ -231,7 +235,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 
 	size_t dataSize = instanceCount * sizeof(vk::AccelerationStructureInstanceKHR);
 
-	VKQuick::Buffer instanceBuffer = m_memoryManager->CreateBuffer(
+	VKQuick::Buffer instanceBuffer = m_memoryManager.CreateBuffer(
 		{
 			.size  = dataSize,
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress | 
@@ -246,7 +250,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 	vk::AccelerationStructureGeometryKHR tlasGeometry;
 	tlasGeometry.geometryType = vk::GeometryTypeKHR::eInstances;
 	tlasGeometry.geometry = vk::AccelerationStructureGeometryInstancesDataKHR();
-	tlasGeometry.geometry.instances.data = instanceBuffer.deviceAddress;
+	tlasGeometry.geometry.instances.data = instanceBuffer.GetDeviceAddress();
 
 	vk::AccelerationStructureBuildGeometryInfoKHR geomInfo;
 	geomInfo.flags			= flags;
@@ -259,7 +263,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 	vk::AccelerationStructureBuildSizesInfoKHR sizesInfo;
 	m_device.getAccelerationStructureBuildSizesKHR(vk::AccelerationStructureBuildTypeKHR::eDevice, &geomInfo, &instanceCount, &sizesInfo);
 
-	m_tlasBuffer = m_memoryManager->CreateBuffer(
+	m_tlasBuffer = m_memoryManager.CreateBuffer(
 		{
 			.size	= sizesInfo.accelerationStructureSize,
 			.usage	=	vk::BufferUsageFlagBits::eShaderDeviceAddress | 
@@ -271,13 +275,13 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 
 
 	vk::AccelerationStructureCreateInfoKHR tlasCreateInfo;
-	tlasCreateInfo.buffer = m_tlasBuffer.buffer;
+	tlasCreateInfo.buffer = m_tlasBuffer;
 	tlasCreateInfo.size = sizesInfo.accelerationStructureSize;
 	tlasCreateInfo.type = vk::AccelerationStructureTypeKHR::eTopLevel;
 	
 	m_tlas = m_device.createAccelerationStructureKHRUnique(tlasCreateInfo);
 
-	VKQuick::Buffer scratchBuffer = m_memoryManager->CreateBuffer(
+	VKQuick::Buffer scratchBuffer = m_memoryManager.CreateBuffer(
 		{
 				.size	= sizesInfo.buildScratchSize,
 				.usage	=	vk::BufferUsageFlagBits::eShaderDeviceAddress |
@@ -288,7 +292,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 		"Instance Buffer"
 	);
 
-	vk::DeviceAddress scratchAddr = m_device.getBufferAddress({ .buffer = scratchBuffer.buffer });
+	vk::DeviceAddress scratchAddr = scratchBuffer.GetDeviceAddress();
 
 	geomInfo.srcAccelerationStructure = nullptr;
 	geomInfo.dstAccelerationStructure = *m_tlas;
