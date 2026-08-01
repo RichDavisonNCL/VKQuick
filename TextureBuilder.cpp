@@ -155,9 +155,7 @@ UniqueTexture TextureBuilder::BuildCubemapFromFile(
     job.endLayout = m_layout;
     job.aspect = vk::ImageAspectFlagBits::eColor;
 
-    vk::Extent3D  dimensions[6]{ vk::Extent3D(0, 0, 1) };
-    uint32_t channels[6] = { 0 };
-    uint32_t flags[6] = { 0 };
+    LoadedTexture faceData[6];
 
     const std::string* filenames[6] = {
         &negativeXFile,
@@ -165,29 +163,33 @@ UniqueTexture TextureBuilder::BuildCubemapFromFile(
         &negativeYFile,
         &positiveYFile,
         &negativeZFile,
-        &positiveZFile
+        &positiveZFile,
     };
 
-    //for (int i = 0; i < 6; ++i) {
-    //    TextureLoader::LoadTexture(*filenames[i], job.dataSrcs[i], dimensions[i].x, dimensions[i].y, channels[i], flags[i]);
-    //}
+    for (int i = 0; i < 6; ++i) {
+        faceData[i] = s_loadFunction(*filenames[i]);
+        job.dataSrcs[i] = faceData[i].texData;
+    }
 
     vk::ImageUsageFlags	realUsages = m_usages;
 
     m_usages |= vk::ImageUsageFlagBits::eTransferDst;
 
-    uint32_t dataWidth = sizeof(char) * channels[0];
+    job.faceByteCount   =   faceData[0].dimensions.width * 
+                            faceData[0].dimensions.height *
+                            faceData[0].dimensions.depth *
+                            faceData[0].channels *
+                            sizeof(char);
+    job.dimensions      = faceData[0].dimensions;
 
-    job.faceByteCount   = dimensions[0].width * dimensions[0].height * dimensions[0].depth * channels[0] * sizeof(char);
-    job.dimensions      = dimensions[0];
-
-    UniqueTexture tex = GenerateTexture(m_cmdBuffer, dimensions[0], true, debugName);
+    UniqueTexture tex = GenerateTexture(m_cmdBuffer, faceData[0].dimensions, true, debugName);
     job.image = tex->GetImage();
 
     UploadTextureData(m_cmdBuffer, job);
-    //for (int i = 0; i < 6; ++i) {
-    //    TextureLoader::DeleteTextureData(job.dataSrcs[i]);
-    //}
+
+    for (int i = 0; i < 6; ++i) {
+        s_releaseFunction(faceData[i]);
+    }
 
     FinaliseTexture(debugName, m_cmdBuffer, job, tex);
 
