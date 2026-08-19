@@ -17,27 +17,27 @@ Mesh::Mesh() {
 Mesh::~Mesh() {
 }
 
-bool Mesh::GeAttributeData(uint32_t index, uint32_t& offset, size_t& size, vk::Format& format, size_t& stride) {
+bool Mesh::GeAttributeData(uint32_t index, AttributeData& data) {
 	for (int i = 0; i < m_attributeDescriptions.size(); ++i) {
 		vk::VertexInputAttributeDescription& description = m_attributeDescriptions[i];
 		if (description.location == index) {
-			offset	= m_usedOffsets[i];
-			size	= m_reservedAttributeSizes[i];
-			format	= description.format;
-			stride  = m_attributeBindings[i].stride;
+			data.offset		= m_usedOffsets[i];
+			data.size		= m_reservedAttributeSizes[i];
+			data.format		= description.format;
+			data.stride		= m_attributeBindings[i].stride;
 			return true;
 		}
 	}
 	return false;
 }
 
-bool Mesh::GetIndexData(uint32_t& offset, size_t& size, vk::IndexType& type) {
+bool Mesh::GetIndexData(IndexData& data) {
 	if (m_reservedIndexSize == 0) {
 		return false;
 	}
-	offset	= m_indexDataOffset;
-	size	= m_reservedIndexSize;
-	type	= m_indexType;
+	data.offset	= m_indexDataOffset;
+	data.size	= m_reservedIndexSize;
+	data.type	= m_indexType;
 	return true;
 }
 

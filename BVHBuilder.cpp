@@ -75,26 +75,20 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 		size_t posIndex = i->GetPositionAttributeIndex();
 		const VKQuick::Buffer& buffer = i->GetBuffer();
 
-		uint32_t	vOffset;
-		size_t		vSize;
-		vk::Format	vFormat;
-		size_t		vStride;
+		AttributeData	attributeData;
+		IndexData		indexData;
 
-		uint32_t		iOffset;
-		size_t			iSize;
-		vk::IndexType	iFormat;
-
-		bool hasPositions	= i->GeAttributeData(posIndex, vOffset, vSize, vFormat, vStride);
-		bool hasIndices		= i->GetIndexData(iOffset, iSize, iFormat);
+		bool hasPositions	= i->GeAttributeData(posIndex, attributeData);
+		bool hasIndices		= i->GetIndexData(indexData);
 
 		vk::AccelerationStructureGeometryTrianglesDataKHR triData;
-		triData.vertexFormat = vFormat;
-		triData.vertexData.deviceAddress = buffer.GetDeviceAddress() + vOffset;
-		triData.vertexStride = vStride;
+		triData.vertexFormat = attributeData.format;
+		triData.vertexData.deviceAddress = buffer.GetDeviceAddress() + attributeData.offset;
+		triData.vertexStride = attributeData.stride;
 
 		if (hasIndices) {
-			triData.indexType = iFormat;
-			triData.indexData.deviceAddress = buffer.GetDeviceAddress() + iOffset;
+			triData.indexType = indexData.type;
+			triData.indexData.deviceAddress = buffer.GetDeviceAddress() + indexData.offset;
 		}
 
 		triData.maxVertex = i->GetVertexCount();
@@ -124,7 +118,7 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 			blasEntry.geometries[j].geometry.triangles.maxVertex = m.count;
 
 			blasEntry.ranges[j].firstVertex		= m.base;
-			blasEntry.ranges[j].primitiveOffset = m.start *(iFormat == vk::IndexType::eUint32 ? 4 : 2);
+			blasEntry.ranges[j].primitiveOffset = m.start *(indexData.type == vk::IndexType::eUint32 ? sizeof(uint32_t) : sizeof(uint16_t));
 
 			size_t primCount = m.count / 3;
 			//TODO: isone of these wrong...

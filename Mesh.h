@@ -17,6 +17,19 @@ namespace VKQuick {
 		int base	= 0;
 	};
 
+	struct AttributeData {
+		uint32_t	offset;
+		size_t		size;
+		vk::Format	format;
+		size_t		stride;
+	};
+
+	struct IndexData {
+		uint32_t		offset;
+		size_t			size;
+		vk::IndexType	type;
+	};
+
 	class Mesh {
 		friend class MeshBuilder;
 	public:
@@ -32,8 +45,8 @@ namespace VKQuick {
 		void DrawLayer(uint32_t layer, vk::CommandBuffer  to, uint32_t instanceCount = 1);
 		void Draw(vk::CommandBuffer  to, uint32_t instanceCount = 1);
 
-		bool GeAttributeData(uint32_t index, uint32_t& offset, size_t& size, vk::Format& format, size_t& stride);
-		bool GetIndexData(uint32_t& offset, size_t& size, vk::IndexType& type);
+		bool GeAttributeData(uint32_t index, AttributeData& data);
+		bool GetIndexData(IndexData& data);
 
 		bool IsHostVisibleBuffer() const;
 
