@@ -13,19 +13,6 @@ using namespace VKQuick;
 ComputePipelineBuilder::ComputePipelineBuilder(vk::Device device) : PipelineBuilderBase(device){
 }
 
-ComputePipelineBuilder& ComputePipelineBuilder::WithShaderBinary(const std::string& filename, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(VKQuick::shaderFolderRoot + filename, vk::ShaderStageFlagBits::eCompute, m_sourceDevice));
-	m_usedModules.push_back(m_loadedShaderModules.back().get());
-	m_entryPoint	= entrypoint;
-	return *this;
-}
-
-ComputePipelineBuilder& ComputePipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
-	m_usedModules.push_back(&module);
-	m_entryPoint	= entrypoint;
-	return *this;
-}
-
 Pipeline	ComputePipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
 	Pipeline output;
 	assert(!m_usedModules.empty());
@@ -35,7 +22,7 @@ Pipeline	ComputePipelineBuilder::Build(const std::string& debugName, vk::Pipelin
 	vk::PipelineShaderStageCreateInfo	m_createInfo;
 	m_createInfo.stage	= vk::ShaderStageFlagBits::eCompute;
 	m_createInfo.module = *m_usedModules[0]->m_shaderModule;
-	m_createInfo.pName	= m_entryPoint.c_str();
+	m_createInfo.pName	= m_moduleEntryPoints[0].c_str();
 
 	m_pipelineCreate.setLayout(*output.layout);
 	m_pipelineCreate.setStage(m_createInfo);

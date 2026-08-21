@@ -21,12 +21,14 @@ namespace VKQuick {
 		ComputePipelineBuilder(vk::Device m_device);
 		~ComputePipelineBuilder() {}
 
-		ComputePipelineBuilder& WithShaderBinary(const std::string& filename, const std::string& entrypoint = "main");
-		ComputePipelineBuilder& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main");
+		ComputePipelineBuilder& WithShaderBinary(const std::string& filename, const std::string& entrypoint = "main")
+		{
+			return PipelineBuilderBase::WithShaderBinary(filename, vk::ShaderStageFlagBits::eCompute, entrypoint);
+		}
 
 		Pipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
 
 	protected:
-		std::string			m_entryPoint;
+
 	};
 };

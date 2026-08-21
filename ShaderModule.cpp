@@ -53,7 +53,8 @@ ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits 
 		std::cout << __FUNCTION__ << ": Problem loading shader file " << filename << "!\n";
 		assert(data.size() > 0);
 	}
-	m_shaderStage = stage;
+	m_shaderStage	= stage;
+	m_fileName		= filename;
 }
 
 void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage) const {
@@ -125,7 +126,7 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 			m_allLayoutsBindings.resize(set->set + 1);
 		}
 		std::vector<vk::DescriptorSetLayoutBinding>& setLayout = m_allLayoutsBindings[set->set];
-		//setLayout.resize(set->binding_count);
+
 		for (int i = 0; i < set->binding_count; ++i) {
 			SpvReflectDescriptorBinding* binding = set->bindings[i];
 
@@ -138,12 +139,12 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 
 			if (setLayout[index].stageFlags != vk::ShaderStageFlags()) {
 				//Check that something hasn't gone wrong with the binding combo!
-				if (setLayout[index].descriptorType != (vk::DescriptorType)binding->descriptor_type) {
+				//if (setLayout[index].descriptorType != (vk::DescriptorType)binding->descriptor_type) {
 
-				}
-				if (setLayout[index].descriptorCount != binding->count) {
+				//}
+				//if (setLayout[index].descriptorCount != binding->count) {
 
-				}
+				//}
 			}
 			setLayout[index].binding			= index;
 			setLayout[index].descriptorCount	= binding->count;

@@ -155,20 +155,6 @@ PipelineBuilder& PipelineBuilder::WithTessellationPatchVertexCount(uint32_t cont
 	return *this;
 }
 
-PipelineBuilder& PipelineBuilder::WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(VKQuick::shaderFolderRoot + filename, stage, m_sourceDevice));
-	m_usedModules.push_back(m_loadedShaderModules.back().get());
-	m_moduleEntryPoints.push_back(entrypoint);
-	return *this;
-}
-
-
-PipelineBuilder& PipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
-	m_usedModules.push_back(&module);
-	m_moduleEntryPoints.push_back(entrypoint);
-	return *this;
-}
-
 Pipeline	PipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
 	m_blendCreate.setAttachments(m_blendAttachStates);
 	m_blendCreate.setBlendConstants({ 1.0f, 1.0f, 1.0f, 1.0f });

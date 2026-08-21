@@ -67,6 +67,29 @@ namespace VKQuick {
 			return (T&)*this;
 		}
 
+		T& WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage,const std::string& entrypoint = "main") {
+			std::string searchName = VKQuick::shaderFolderRoot + filename;
+
+			//for (auto& i : m_loadedShaderModules) {
+			//	if (i->m_fileName == searchName) {
+			//		//We've already loaded this binary once!
+
+			//	}
+			//}
+
+			m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(searchName, stage, m_sourceDevice));
+
+			m_usedModules.push_back(m_loadedShaderModules.back().get());
+			m_moduleEntryPoints.push_back(entrypoint);
+			return (T&)*this;
+		}
+
+		T& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main") {
+			m_usedModules.push_back(&module);
+			m_moduleEntryPoints.push_back(entrypoint);
+			return (T&)*this;
+		}
+
 	protected:
 		PipelineBuilderBase(vk::Device device) {
 			m_sourceDevice = device;

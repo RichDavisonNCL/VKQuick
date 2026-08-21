@@ -18,9 +18,6 @@ namespace VKQuick {
 		RayTracingPipelineBuilder(vk::Device device, vk::PhysicalDevice physicalDevice, MemoryManager& memManager);
 		~RayTracingPipelineBuilder();
 
-		RayTracingPipelineBuilder& WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main");
-		RayTracingPipelineBuilder& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main");
-
 		RayTracingPipelineBuilder& WithRayGenGroup(uint32_t shaderIndex);
 		RayTracingPipelineBuilder& WithMissGroup(uint32_t shaderIndex);
 		RayTracingPipelineBuilder& WithTriangleHitGroup(uint32_t closestHit = VK_SHADER_UNUSED_KHR, uint32_t anyHit = VK_SHADER_UNUSED_KHR);

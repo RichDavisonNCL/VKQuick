@@ -67,21 +67,6 @@ RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithProceduralHitGroup(uin
 	return *this;
 }
 
-RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage, const std::string& entrypoint) {
-	m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(VKQuick::shaderFolderRoot + filename, stage, m_sourceDevice));
-	m_usedModules.push_back(m_loadedShaderModules.back().get());
-	m_moduleEntryPoints.push_back(entrypoint);
-
-	return *this;
-}
-
-RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithShaderModule(const ShaderModule& module, const std::string& entrypoint) {
-	m_usedModules.push_back(&module);
-	m_moduleEntryPoints.push_back(entrypoint);
-
-	return *this;
-}
-
 RayPipeline RayTracingPipelineBuilder::Build(const std::string& debugName, vk::PipelineCache cache) {
 	RayPipeline output;
 	

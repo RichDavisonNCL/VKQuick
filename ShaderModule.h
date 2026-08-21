@@ -26,6 +26,7 @@ namespace VKQuick {
 
 		vk::UniqueShaderModule				m_shaderModule;
 		vk::ShaderStageFlagBits				m_shaderStage;
+		std::string							m_fileName;
 	};
 
 	using UniqueShaderModule = std::unique_ptr<ShaderModule>;
