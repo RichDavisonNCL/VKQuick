@@ -33,8 +33,7 @@ std::vector<char>	ReadBinaryFile(const std::string& filename) {
 	return data;
 }
 
-
-ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits stage, vk::Device device)	{
+ShaderModule::ShaderModule(const std::string& filename, vk::Device device)	{
 	std::vector<char> data = ReadBinaryFile(filename);
 
 	if (data.size() > 0) {
@@ -45,7 +44,7 @@ ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits 
 				.pCode		= (const uint32_t*)data.data()	
 			}
 		);
-		AddReflectionData(data, stage);
+		AddReflectionData(data);
 
 		VKQuick::SetDebugName(device, *m_shaderModule, filename);
 	}
@@ -53,17 +52,12 @@ ShaderModule::ShaderModule(const std::string& filename, vk::ShaderStageFlagBits 
 		std::cout << __FUNCTION__ << ": Problem loading shader file " << filename << "!\n";
 		assert(data.size() > 0);
 	}
-	m_shaderStage	= stage;
 	m_fileName		= filename;
 }
 
 void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage) const {
 	const int numSets = std::max(inoutBindings.size(), m_allLayoutsBindings.size());
 	inoutBindings.resize(numSets);
-
-	if (!layoutStage) {
-		layoutStage = m_shaderStage;
-	}
 
 	for (int i = 0; i < m_allLayoutsBindings.size(); ++i) {
 		std::vector<vk::DescriptorSetLayoutBinding>& outSet		= inoutBindings[i];
@@ -73,7 +67,7 @@ void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorS
 		outSet.resize(numBindings);
 
 		for (int j = 0; j < baseSet.size(); ++j) {
-			if (baseSet[j].stageFlags != vk::ShaderStageFlags()) {
+			//if (baseSet[j].stageFlags != vk::ShaderStageFlags()) {
 				//Check that something hasn't gone wrong with the binding combo!
 				if (baseSet[j].descriptorType != outSet[j].descriptorType) {
 
@@ -86,29 +80,30 @@ void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorS
 				outSet[j].descriptorType	= baseSet[j].descriptorType;			
 				
 				outSet[j].stageFlags		|= layoutStage; //Combine sets across shader stages
-			}
+			//}
 		}
 	}
 }
 
-void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges) const {
+void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges, vk::ShaderStageFlags layoutStage) const {
 	for (int i = 0; i < m_pushConstants.size(); ++i) {
 		bool found = false;
 		for (int j = 0; j < inoutRanges.size(); ++j) {
 			if (m_pushConstants[i].offset == inoutRanges[j].offset &&
 				m_pushConstants[i].size == inoutRanges[j].size) {
-				inoutRanges[j].stageFlags |= m_shaderStage;
+				inoutRanges[j].stageFlags |= layoutStage;
 				found = true;
 				break;
 			}
 		}
 		if (!found) {
 			inoutRanges.push_back(m_pushConstants[i]);
+			inoutRanges.back().stageFlags = layoutStage;
 		}
 	}
 }
 
-void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderStageFlags stage) {
+void ShaderModule::AddReflectionData(const std::vector<char>& data) {
 	SpvReflectShaderModule module;
 	SpvReflectResult result = spvReflectCreateShaderModule(data.size(), data.data(), &module);
 	assert(result == SPV_REFLECT_RESULT_SUCCESS);
@@ -136,21 +131,9 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 			if (index >= setLayout.size()) {
 				setLayout.resize(index + 1);
 			}
-
-			if (setLayout[index].stageFlags != vk::ShaderStageFlags()) {
-				//Check that something hasn't gone wrong with the binding combo!
-				//if (setLayout[index].descriptorType != (vk::DescriptorType)binding->descriptor_type) {
-
-				//}
-				//if (setLayout[index].descriptorCount != binding->count) {
-
-				//}
-			}
 			setLayout[index].binding			= index;
 			setLayout[index].descriptorCount	= binding->count;
 			setLayout[index].descriptorType		= (vk::DescriptorType)binding->descriptor_type;
-
-			setLayout[index].stageFlags |= stage; //Combine sets across shader stages
 		}
 	}
 
@@ -170,7 +153,7 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 			for (int i = 0; i < m_pushConstants.size(); ++i) {
 				if (m_pushConstants[i].offset == member.offset &&
 					m_pushConstants[i].size == member.size) {
-					m_pushConstants[i].stageFlags |= stage;
+					//m_pushConstants[i].stageFlags |= stage;
 					found = true;
 					break;
 				}
@@ -179,7 +162,7 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 				vk::PushConstantRange range;
 				range.offset = constant->offset;
 				range.size = constant->size;
-				range.stageFlags = stage;
+				//range.stageFlags = stage;
 				m_pushConstants.push_back(range);
 			}
 		}

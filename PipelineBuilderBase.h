@@ -77,16 +77,18 @@ namespace VKQuick {
 			//	}
 			//}
 
-			m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(searchName, stage, m_sourceDevice));
+			m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(searchName, m_sourceDevice));
 
 			m_usedModules.push_back(m_loadedShaderModules.back().get());
 			m_moduleEntryPoints.push_back(entrypoint);
+			m_moduleShaderStages.push_back(stage);
 			return (T&)*this;
 		}
 
-		T& WithShaderModule(const ShaderModule& module, const std::string& entrypoint = "main") {
+		T& WithShaderModule(const ShaderModule& module, vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main") {
 			m_usedModules.push_back(&module);
 			m_moduleEntryPoints.push_back(entrypoint);
+			m_moduleShaderStages.push_back(stage);
 			return (T&)*this;
 		}
 
@@ -101,7 +103,7 @@ namespace VKQuick {
 				vk::PipelineShaderStageCreateInfo stageInfo;
 
 				stageInfo.pName = m_moduleEntryPoints[i].c_str();
-				stageInfo.stage = m_usedModules[i]->m_shaderStage;
+				stageInfo.stage = m_moduleShaderStages[i];
 				stageInfo.module = *m_usedModules[i]->m_shaderModule;
 
 				m_shaderStages.push_back(stageInfo);
@@ -115,10 +117,11 @@ namespace VKQuick {
 				m_pipelineCreate.setLayout(m_externalLayout);
 			}
 			else {
-				for (auto& module : m_usedModules) {
-					vk::ShaderStageFlags stageFlags = minimiseLayoutStages ? module->m_shaderStage : vk::ShaderStageFlagBits::eAll;
-					module->CombineLayoutBindings(output.m_allLayoutsBindings, stageFlags);
-					module->CombinePushConstantRanges(output.m_pushConstants);
+				for (int i = 0; i < m_usedModules.size(); ++i) {
+
+					vk::ShaderStageFlags stageFlags = minimiseLayoutStages ? m_moduleShaderStages[i] : vk::ShaderStageFlagBits::eAll;
+					m_usedModules[i]->CombineLayoutBindings(output.m_allLayoutsBindings, stageFlags);
+					m_usedModules[i]->CombinePushConstantRanges(output.m_pushConstants, stageFlags);
 				}
 				FinaliseLayout(output);
 			}
@@ -179,5 +182,6 @@ namespace VKQuick {
 		std::vector<const ShaderModule*>			m_usedModules;
 		std::vector<UniqueShaderModule>			m_loadedShaderModules;
 		std::vector<std::string>						m_moduleEntryPoints;
+		std::vector< vk::ShaderStageFlagBits >			m_moduleShaderStages;
 	};
 }
