@@ -11,15 +11,25 @@ License: MIT (see LICENSE file at the top of the source tree)
 namespace VKQuick {
 	class DescriptorSetBuilder {
 	public:
-		DescriptorSetBuilder(vk::Device device, vk::DescriptorPool pool, vk::DescriptorSetLayout layout) {
+		DescriptorSetBuilder(vk::Device device, vk::DescriptorPool pool, vk::DescriptorSetLayout layout, uint32_t variableDescriptorCount = 0) {
 			m_device	= device;
 			m_layout	= layout;
+
+			vk::DescriptorSetVariableDescriptorCountAllocateInfoEXT variableDescriptorInfo{
+				.descriptorSetCount = 1,
+				.pDescriptorCounts	= &variableDescriptorCount
+			};
 
 			vk::DescriptorSetAllocateInfo allocateInfo{
 				.descriptorPool		= pool,
 				.descriptorSetCount = 1,
 				.pSetLayouts		= &layout
 			};
+
+			if (variableDescriptorCount > 0) {
+				allocateInfo.pNext = (const void*)&variableDescriptorInfo;
+			};
+
 			m_set = std::move(device.allocateDescriptorSetsUnique(allocateInfo)[0]);
 		}
 		~DescriptorSetBuilder() = default;

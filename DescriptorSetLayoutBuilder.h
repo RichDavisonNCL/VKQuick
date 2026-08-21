@@ -42,6 +42,9 @@ namespace VKQuick {
 
 		DescriptorSetLayoutBuilder& WithCreationFlags(vk::DescriptorSetLayoutCreateFlags flags);
 
+		//Adds these flags to EVERY entry in the layout
+		DescriptorSetLayoutBuilder& WithGlobalBindingFlags(vk::DescriptorBindingFlags flags);
+
 		vk::UniqueDescriptorSetLayout Build(const std::string& debugName = "");
 
 	protected:
@@ -49,6 +52,8 @@ namespace VKQuick {
 
 		std::vector< vk::DescriptorSetLayoutBinding>	m_addedBindings;
 		std::vector< vk::DescriptorBindingFlags>		m_addedFlags;
+
+		vk::DescriptorBindingFlags m_globalFlags;
 
 		vk::DescriptorSetLayoutCreateInfo m_createInfo;
 	};

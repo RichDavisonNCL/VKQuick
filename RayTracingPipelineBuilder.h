@@ -41,8 +41,6 @@ namespace VKQuick {
 
 		uint32_t handleCounts[BindingTableOrder::MAX_SIZE] = { };
 
-		//VKQuick::ShaderBindingTable* m_table = nullptr;
-
 		vk::PhysicalDevice	m_physicalDevice;
 		MemoryManager&		m_memoryManager;
 

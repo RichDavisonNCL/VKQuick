@@ -88,9 +88,18 @@ DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::WithCreationFlags(vk::De
 	return *this;
 }
 
+DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::WithGlobalBindingFlags(vk::DescriptorBindingFlags flags) {
+	m_globalFlags = flags;
+	return *this;
+}
+
 vk::UniqueDescriptorSetLayout DescriptorSetLayoutBuilder::Build(const std::string& debugName) {
 	m_createInfo.setBindings(m_addedBindings);
 	vk::DescriptorSetLayoutBindingFlagsCreateInfoEXT bindingFlagsInfo;
+
+	for (vk::DescriptorBindingFlags& i : m_addedFlags) {
+		i |= m_globalFlags;
+	}
 	
 	bindingFlagsInfo.setBindingFlags(m_addedFlags);
 

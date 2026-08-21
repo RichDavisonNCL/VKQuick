@@ -54,17 +54,12 @@ MeshBuilder& MeshBuilder::WithMeshRange(int start, int vertCount, int baseVertex
     return *this;
 }
 
-MeshBuilder& MeshBuilder::WithPositionAttributeIndex(uint32_t index) {
-    m_mesh->m_positionAttribIndex = index;
-    return *this;
-}
-
 MeshBuilder& MeshBuilder::WithHostVisibleBuffers() {
     m_mesh->m_hostVisibleBuffers = true;
     return *this;
 }
 
-MeshBuilder& MeshBuilder::WithVertexAttribute(uint32_t index, vk::Format format, size_t stride, vk::VertexInputRate inputRate) {
+MeshBuilder& MeshBuilder::WithVertexAttribute(uint32_t index, vk::Format format, size_t stride, VKQuick::AttributeType attribType, vk::VertexInputRate inputRate) {
     vk::VertexInputAttributeDescription attribute;
     vk::VertexInputBindingDescription binding;
 
@@ -79,6 +74,7 @@ MeshBuilder& MeshBuilder::WithVertexAttribute(uint32_t index, vk::Format format,
 
     m_mesh->m_attributeDescriptions.push_back(attribute);
     m_mesh->m_attributeBindings.push_back(binding);
+    m_mesh->m_attributeTypes.push_back(attribType);
 
     return *this;
 }

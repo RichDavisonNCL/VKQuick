@@ -27,9 +27,7 @@ namespace VKQuick {
 
 		MeshBuilder& WithMeshRange(int start, int vertCount, int baseVertex);
 
-		MeshBuilder& WithVertexAttribute(uint32_t index, vk::Format format, size_t stride, vk::VertexInputRate rate = vk::VertexInputRate::eVertex);
-
-		MeshBuilder& WithPositionAttributeIndex(uint32_t index);
+		MeshBuilder& WithVertexAttribute(uint32_t index, vk::Format format, size_t stride, VKQuick::AttributeType attribType = VKQuick::AttributeType::UserData, vk::VertexInputRate rate = vk::VertexInputRate::eVertex);
 
 		UniqueMesh Build();
 

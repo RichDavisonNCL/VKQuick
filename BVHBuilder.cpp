@@ -32,25 +32,22 @@ BVHBuilder& BVHBuilder::WithFlags(vk::BuildAccelerationStructureFlagsKHR flags) 
 	return *this;
 }
 
-BVHBuilder& BVHBuilder::WithObject(VKQuick::Mesh* m, const vk::TransformMatrixKHR& transform, uint32_t mask, uint32_t hitID) {
-	auto savedMesh = m_uniqueMeshes.find(m);
+BVHBuilder& BVHBuilder::WithObject(BVHInput input) {
+	auto savedMesh = m_uniqueMeshes.find(input.mesh);
 
 	uint32_t meshID = 0;
 
 	if (savedMesh == m_uniqueMeshes.end()) {
-		m_meshes.push_back(m);
+		m_meshes.push_back(input.mesh);
 		meshID = m_meshes.size() - 1;
-		m_uniqueMeshes.insert({m, meshID});
+		m_uniqueMeshes.insert({ input.mesh, meshID});
 	}
 	else {
 		meshID = savedMesh->second;
 	}
 
-	BVHEntry entry;
-	entry.modelMat	= transform;
+	BVHEntry entry	= static_cast<BVHEntry>(input);
 	entry.meshID	= meshID;
-	entry.hitID		= hitID;
-	entry.mask		= mask;
 
 	m_entries.push_back(entry);
 
@@ -72,7 +69,9 @@ vk::UniqueAccelerationStructureKHR BVHBuilder::Build(const std::string& debugNam
 void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 	//We need to first create the BLAS entries for the unique meshes
 	for (const auto& i : m_meshes) {
-		size_t posIndex = i->GetPositionAttributeIndex();
+		size_t posIndex = 0;	
+		i->GetAttributeIndex(VKQuick::AttributeType::Position, posIndex);
+
 		const VKQuick::Buffer& buffer = i->GetBuffer();
 
 		AttributeData	attributeData;
@@ -213,18 +212,16 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 	tlasEntries.resize(instanceCount);
 
 	for (int i = 0; i < instanceCount; ++i) {
-		tlasEntries[i].transform = m_entries[i].modelMat;
+		tlasEntries[i].transform = m_entries[i].transform;
 
 		uint32_t meshID = m_entries[i].meshID;
 
-		tlasEntries[i].instanceCustomIndex = meshID;
-
 		tlasEntries[i].accelerationStructureReference = m_device.getBufferAddress({ .buffer = m_blasBuildInfo[meshID].buffer });
-
 
 		tlasEntries[i].flags = (VkGeometryInstanceFlagBitsKHR)vk::GeometryInstanceFlagBitsKHR::eTriangleFacingCullDisable;
 		tlasEntries[i].mask = m_entries[i].mask;
 		tlasEntries[i].instanceShaderBindingTableRecordOffset = m_entries[i].hitID;
+		tlasEntries[i].instanceCustomIndex = (meshID & ((1 << 24)-1)) | (m_entries[i].customIndex << 24);
 	}
 
 	size_t dataSize = instanceCount * sizeof(vk::AccelerationStructureInstanceKHR);

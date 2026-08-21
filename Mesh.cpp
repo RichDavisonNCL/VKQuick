@@ -17,9 +17,9 @@ Mesh::Mesh() {
 Mesh::~Mesh() {
 }
 
-bool Mesh::GeAttributeData(uint32_t index, AttributeData& data) {
+bool Mesh::GeAttributeData(uint32_t index, AttributeData& data) const {
 	for (int i = 0; i < m_attributeDescriptions.size(); ++i) {
-		vk::VertexInputAttributeDescription& description = m_attributeDescriptions[i];
+		const vk::VertexInputAttributeDescription& description = m_attributeDescriptions[i];
 		if (description.location == index) {
 			data.offset		= m_usedOffsets[i];
 			data.size		= m_reservedAttributeSizes[i];
@@ -31,7 +31,7 @@ bool Mesh::GeAttributeData(uint32_t index, AttributeData& data) {
 	return false;
 }
 
-bool Mesh::GetIndexData(IndexData& data) {
+bool Mesh::GetIndexData(IndexData& data) const {
 	if (m_reservedIndexSize == 0) {
 		return false;
 	}
@@ -57,8 +57,14 @@ size_t Mesh::GetIndexCount()  const {
 	return m_indexCount;
 }
 
-size_t Mesh::GetPositionAttributeIndex() const {
-	return m_positionAttribIndex;
+bool	Mesh::GetAttributeIndex(VKQuick::AttributeType type, size_t& index) const {
+	for (int i = 0; i < m_attributeTypes.size(); ++i) {
+		if (m_attributeTypes[i] == type) {
+			index = m_attributeDescriptions[i].location;
+			return true;
+		}
+	}
+	return false;
 }
 
 const VKQuick::Buffer& Mesh::GetBuffer() const {

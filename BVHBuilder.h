@@ -12,11 +12,17 @@
 #include "BVHBuilder.h"
 
 namespace VKQuick {
-	struct BVHEntry {
-		vk::TransformMatrixKHR modelMat;
-		uint32_t	meshID;
-		uint32_t	hitID;
-		uint32_t	mask;
+
+	struct BVHInput {
+		VKQuick::Mesh* mesh;
+		vk::TransformMatrixKHR transform;
+		uint32_t	hitID = 0;
+		uint32_t	mask = uint32_t(~0);
+		uint32_t	customIndex = 0;
+	};
+
+	struct BVHEntry : BVHInput {
+		uint32_t	meshID		= 0;
 	};
 					
 	struct BLASEntry {
@@ -35,7 +41,7 @@ namespace VKQuick {
 		BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager& inAllocator);
 		~BVHBuilder();
 
-		BVHBuilder& WithObject(VKQuick::Mesh* m, const vk::TransformMatrixKHR& transform, uint32_t mask = ~0, uint32_t hitID = 0);
+		BVHBuilder& WithObject(BVHInput input);
 
 		BVHBuilder& WithCommandQueue(vk::Queue inQueue);
 		BVHBuilder& WithCommandPool(vk::CommandPool inPool);

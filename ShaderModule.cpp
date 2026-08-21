@@ -125,7 +125,7 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data, vk::ShaderSt
 			m_allLayoutsBindings.resize(set->set + 1);
 		}
 		std::vector<vk::DescriptorSetLayoutBinding>& setLayout = m_allLayoutsBindings[set->set];
-		setLayout.resize(set->binding_count);
+		//setLayout.resize(set->binding_count);
 		for (int i = 0; i < set->binding_count; ++i) {
 			SpvReflectDescriptorBinding* binding = set->bindings[i];
 

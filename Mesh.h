@@ -30,6 +30,16 @@ namespace VKQuick {
 		vk::IndexType	type;
 	};
 
+	enum class AttributeType {
+		Position,
+		Colour,
+		TexCoord,
+		TexCoord2,
+		Normals,
+		Tangents,
+		UserData
+	};
+
 	class Mesh {
 		friend class MeshBuilder;
 	public:
@@ -45,8 +55,8 @@ namespace VKQuick {
 		void DrawLayer(uint32_t layer, vk::CommandBuffer  to, uint32_t instanceCount = 1);
 		void Draw(vk::CommandBuffer  to, uint32_t instanceCount = 1);
 
-		bool GeAttributeData(uint32_t index, AttributeData& data);
-		bool GetIndexData(IndexData& data);
+		bool GeAttributeData(uint32_t index, AttributeData& data) const;
+		bool GetIndexData(IndexData& data) const;
 
 		bool IsHostVisibleBuffer() const;
 
@@ -58,7 +68,9 @@ namespace VKQuick {
 		size_t GetVertexCount() const;
 		size_t GetIndexCount()  const;
 
-		size_t GetPositionAttributeIndex() const;
+		bool	GetAttributeIndex(VKQuick::AttributeType type, size_t& index) const;
+
+		//size_t GetPositionAttributeIndex() const;
 
 		const VKQuick::Buffer& GetBuffer() const;
 
@@ -88,6 +100,7 @@ namespace VKQuick {
 		
 		std::vector<vk::VertexInputAttributeDescription>	m_attributeDescriptions;
 		std::vector<vk::VertexInputBindingDescription>		m_attributeBindings;
+		std::vector<VKQuick::AttributeType>					m_attributeTypes;
 
 		std::vector<MeshRange>		m_meshRanges;
 		
