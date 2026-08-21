@@ -119,10 +119,10 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 			blasEntry.ranges[j].firstVertex		= m.base;
 			blasEntry.ranges[j].primitiveOffset = m.start *(indexData.type == vk::IndexType::eUint32 ? sizeof(uint32_t) : sizeof(uint16_t));
 
-			size_t primCount = m.count / 3;
+			size_t elementCount = m.count / 3;
 			//TODO: isone of these wrong...
-			blasEntry.ranges[j].primitiveCount	= primCount;
-			blasEntry.maxPrims[j] = primCount;
+			blasEntry.ranges[j].primitiveCount	= elementCount;
+			blasEntry.maxPrims[j] = elementCount;
 		}
 	}
 
