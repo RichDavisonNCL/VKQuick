@@ -8,10 +8,12 @@ License: MIT (see LICENSE file at the top of the source tree)
 #pragma once
 #include "Pipeline.h"
 #include "ShaderModule.h"
+#include "ShaderModuleCache.h"
 #include "Utils.h"
 
 namespace VKQuick {
 	struct VulkanVertexSpecification;
+
 
 	template <class T, class P>
 	class PipelineBuilderBase	{
@@ -70,25 +72,36 @@ namespace VKQuick {
 		T& WithShaderBinary(const std::string& filename, vk::ShaderStageFlagBits stage,const std::string& entrypoint = "main") {
 			std::string searchName = VKQuick::shaderFolderRoot + filename;
 
-			//for (auto& i : m_loadedShaderModules) {
-			//	if (i->m_fileName == searchName) {
-			//		//We've already loaded this binary once!
+			VKQuick::ShaderModule* module = nullptr;
 
-			//	}
-			//}
+			if (m_cache) {
+				module = m_cache->GetCachedModule(searchName);
+				if (module == nullptr) {
+					module = m_cache->AddCachedModule(searchName);
+				}
+			}
+			else {
+				for (auto& i : m_loadedShaderModules) {
+					if (i->m_fileName == searchName) {
+						//We've already loaded this binary once!
+						module = i.get();
+						break;
+					}
+				}
+				if (module == nullptr) {
+					m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(searchName, m_sourceDevice));
+					module = m_loadedShaderModules.back().get();
+				}
+			}
 
-			m_loadedShaderModules.push_back(std::make_unique<ShaderModule>(searchName, m_sourceDevice));
-
-			m_usedModules.push_back(m_loadedShaderModules.back().get());
+			m_usedModules.push_back(module);
 			m_moduleEntryPoints.push_back(entrypoint);
 			m_moduleShaderStages.push_back(stage);
 			return (T&)*this;
 		}
 
-		T& WithShaderModule(const ShaderModule& module, vk::ShaderStageFlagBits stage, const std::string& entrypoint = "main") {
-			m_usedModules.push_back(&module);
-			m_moduleEntryPoints.push_back(entrypoint);
-			m_moduleShaderStages.push_back(stage);
+		T& WithShaderModuleCache(VKQuick::ShaderModuleCache& cache) {
+			m_cache = &cache;
 			return (T&)*this;
 		}
 
@@ -121,7 +134,9 @@ namespace VKQuick {
 
 					vk::ShaderStageFlags stageFlags = minimiseLayoutStages ? m_moduleShaderStages[i] : vk::ShaderStageFlagBits::eAll;
 					m_usedModules[i]->CombineLayoutBindings(output.m_allLayoutsBindings, stageFlags);
-					m_usedModules[i]->CombinePushConstantRanges(output.m_pushConstants, stageFlags);
+
+
+					m_usedModules[i]->CombinePushConstantRanges(output.m_pushConstants, m_moduleShaderStages[i]);
 				}
 				FinaliseLayout(output);
 			}
@@ -165,6 +180,8 @@ namespace VKQuick {
 		P m_pipelineCreate;
 		vk::PipelineLayout	m_layout;
 		vk::Device			m_sourceDevice;
+
+		VKQuick::ShaderModuleCache* m_cache = nullptr;
 
 		bool minimiseLayoutStages = false;
 

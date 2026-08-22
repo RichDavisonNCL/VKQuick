@@ -26,6 +26,7 @@ set(Header_Files
 	"RayTracingPipelineBuilder.h"	
     "MemoryManager.h"
     "VMAMemoryManager.h"
+    "ShaderModuleCache.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -46,6 +47,7 @@ set(Source_Files
 	"BVHBuilder.cpp"
 	"RayTracingPipelineBuilder.cpp"
     "VMAMemoryManager.cpp"
+    "ShaderModuleCache.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

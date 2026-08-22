@@ -89,12 +89,22 @@ void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>
 	for (int i = 0; i < m_pushConstants.size(); ++i) {
 		bool found = false;
 		for (int j = 0; j < inoutRanges.size(); ++j) {
+			////We've already registered a push constant for this stage
+			////so we can extend it to encompass this one
+			//if (inoutRanges[j].stageFlags == layoutStage) {
+			//	inoutRanges[j].offset	= std::min(inoutRanges[j].offset, m_pushConstants[i].offset);
+			//	inoutRanges[j].size		= std::max(inoutRanges[j].size, m_pushConstants[i].size);
+			//	found = true;
+			//	break;
+			//}
+
 			if (m_pushConstants[i].offset == inoutRanges[j].offset &&
 				m_pushConstants[i].size == inoutRanges[j].size) {
 				inoutRanges[j].stageFlags |= layoutStage;
 				found = true;
 				break;
 			}
+
 		}
 		if (!found) {
 			inoutRanges.push_back(m_pushConstants[i]);
@@ -146,26 +156,10 @@ void ShaderModule::AddReflectionData(const std::vector<char>& data) {
 	assert(result == SPV_REFLECT_RESULT_SUCCESS);
 
 	for (auto& constant : pushConstantLayouts) {
-		for (int i = 0; i < constant->member_count; ++i) {
-			auto& member = constant->members[i];
-			//Check to see if this one was loaded 
-			bool found = false;
-			for (int i = 0; i < m_pushConstants.size(); ++i) {
-				if (m_pushConstants[i].offset == member.offset &&
-					m_pushConstants[i].size == member.size) {
-					//m_pushConstants[i].stageFlags |= stage;
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				vk::PushConstantRange range;
-				range.offset = constant->offset;
-				range.size = constant->size;
-				//range.stageFlags = stage;
-				m_pushConstants.push_back(range);
-			}
-		}
+		vk::PushConstantRange range;
+		range.offset = constant->offset;
+		range.size = constant->size;
+		m_pushConstants.push_back(range);
 	}
 	spvReflectDestroyShaderModule(&module);
 }
