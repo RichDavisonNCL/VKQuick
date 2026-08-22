@@ -230,7 +230,8 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 		{
 			.size  = dataSize,
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress | 
-						vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR,
+						vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR |
+						vk::BufferUsageFlagBits::eAccelerationStructureStorageKHR
 		},
 		vk::MemoryPropertyFlagBits::eHostVisible,
 		"Instance Buffer"
@@ -274,10 +275,11 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 
 	VKQuick::Buffer scratchBuffer = m_memoryManager.CreateBuffer(
 		{
-				.size	= sizesInfo.buildScratchSize,
-				.usage	=	vk::BufferUsageFlagBits::eShaderDeviceAddress |
-							vk::BufferUsageFlagBits::eShaderDeviceAddress |
-							vk::BufferUsageFlagBits::eStorageBuffer
+			.size	= sizesInfo.buildScratchSize,
+			.usage	=	vk::BufferUsageFlagBits::eAccelerationStructureBuildInputReadOnlyKHR |
+						vk::BufferUsageFlagBits::eAccelerationStructureStorageKHR |
+						vk::BufferUsageFlagBits::eStorageBuffer |
+						vk::BufferUsageFlagBits::eShaderDeviceAddress
 		},
 		vk::MemoryPropertyFlagBits::eHostVisible,
 		"Instance Buffer"

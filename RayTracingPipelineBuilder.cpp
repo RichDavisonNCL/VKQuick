@@ -116,10 +116,9 @@ void RayTracingPipelineBuilder::FillSBTCounts(const vk::RayTracingPipelineCreate
 	}
 }
 
-
-int MakeMultipleOf(int input, int multiple) {
-	int count = input / multiple;
-	int r = input % multiple;
+uint32_t MakeMultipleOf(uint32_t input, uint32_t multiple) {
+	uint32_t count = input / multiple;
+	uint32_t r = input % multiple;
 
 	if (r != 0) {
 		count += 1;
@@ -128,14 +127,15 @@ int MakeMultipleOf(int input, int multiple) {
 	return count * multiple;
 }
 
+vk::DeviceAddress AlignmentOffset(vk::DeviceAddress input, uint32_t alignment) {
+	vk::DeviceAddress remainder = input % alignment;
+	return alignment - remainder;
+}
+
 void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::string& debugName) {
 	FillSBTCounts(&m_pipelineCreate); //Fills the handleIndices vectors
 
 	uint32_t numShaderGroups = m_pipelineCreate.groupCount;
-	//for (auto& i : libraries) {
-	//	numShaderGroups += i->groupCount;
-	//	FillSBTCounts(i);
-	//}
 
 	vk::PhysicalDeviceRayTracingPipelinePropertiesKHR rayPipelineProperties;
 	vk::PhysicalDeviceProperties2 properties;
@@ -160,7 +160,7 @@ void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::stri
 
 	pipeline.bindingTable.tableBuffer = m_memoryManager.CreateBuffer(
 		{
-			.size = bufferSize,
+			.size = bufferSize + (rayPipelineProperties.shaderGroupBaseAlignment * BindingTableOrder::MAX_SIZE),
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress		|
 						vk::BufferUsageFlagBits::eTransferSrc				|
 						vk::BufferUsageFlagBits::eShaderDeviceAddressKHR	|
@@ -170,22 +170,28 @@ void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::stri
 		debugName + " SBT Buffer"
 	);
 
-
 	vk::DeviceAddress bufferAddress = pipeline.bindingTable.tableBuffer.GetDeviceAddress();
+	vk::DeviceAddress bufferOffset	= AlignmentOffset(bufferAddress , rayPipelineProperties.shaderGroupBaseAlignment);
 
-	char* bufferData = (char*)pipeline.bindingTable.tableBuffer.Map();
+	bufferAddress += bufferOffset;
+
+	char* dataPtr = (char*)pipeline.bindingTable.tableBuffer.Map();
+	dataPtr += bufferOffset;
+
 	int dataOffset = 0;
+
 	int currentHandleIndex = 0;
 
 	for (int i = 0; i < BindingTableOrder::MAX_SIZE; ++i) { //For each group type
-		int dataOffsetStart = dataOffset;
-		pipeline.bindingTable.regions[i].deviceAddress = bufferAddress + dataOffsetStart;
-	
+		dataOffset += AlignmentOffset(dataOffset, rayPipelineProperties.shaderGroupBaseAlignment);
+
+		pipeline.bindingTable.regions[i].deviceAddress = bufferAddress + dataOffset;
+
 		for (int j = 0; j < handleCounts[i]; ++j) { //For entries in that group
-			memcpy(bufferData + dataOffset, handles.data() + (currentHandleIndex++ * handleSize), handleSize);
+			memcpy(dataPtr + dataOffset, handles.data() + (currentHandleIndex++ * handleSize), handleSize);
 			dataOffset += alignedHandleSize;
 		}
-		dataOffset = dataOffsetStart + pipeline.bindingTable.regions[i].size;
+		dataOffset += pipeline.bindingTable.regions[i].size;
 	}
 
 	pipeline.bindingTable.tableBuffer.Unmap();
