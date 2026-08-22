@@ -9,12 +9,20 @@ License: MIT (see LICENSE file at the top of the source tree)
 
 namespace VKQuick {
 	class ShaderModule  {
-	public:
-		ShaderModule(const std::string& filename, vk::Device device);
+		friend class ShaderModuleCache;
 
-		~ShaderModule() = default;
+	public:
+
+		vk::ShaderModule GetShaderModule() const {
+			return *m_shaderModule;
+		}
+
 		void CombineLayoutBindings(std::vector<std::vector<vk::DescriptorSetLayoutBinding>>& inoutBindings, vk::ShaderStageFlags layoutStage)	const;
 		void CombinePushConstantRanges(std::vector< vk::PushConstantRange>& inoutRanges, vk::ShaderStageFlags layoutStage)						const;
+
+	protected:
+		ShaderModule(const std::string& filename, vk::Device device);
+		~ShaderModule() = default;
 
 	//protected:		
 		void AddReflectionData(const std::vector<char>& data);

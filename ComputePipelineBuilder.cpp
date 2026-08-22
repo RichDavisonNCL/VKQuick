@@ -21,7 +21,7 @@ Pipeline	ComputePipelineBuilder::Build(const std::string& debugName, vk::Pipelin
 
 	vk::PipelineShaderStageCreateInfo	m_createInfo;
 	m_createInfo.stage	= vk::ShaderStageFlagBits::eCompute;
-	m_createInfo.module = *m_usedModules[0]->m_shaderModule;
+	m_createInfo.module = m_usedModules[0]->GetShaderModule();
 	m_createInfo.pName	= m_moduleEntryPoints[0].c_str();
 
 	m_pipelineCreate.setLayout(*output.layout);

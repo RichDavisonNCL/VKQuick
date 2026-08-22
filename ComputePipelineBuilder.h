@@ -27,8 +27,5 @@ namespace VKQuick {
 		}
 
 		Pipeline	Build(const std::string& debugName = "", vk::PipelineCache cache = {});
-
-	protected:
-
 	};
 };

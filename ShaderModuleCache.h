@@ -12,13 +12,15 @@ namespace VKQuick {
 	class ShaderModuleCache  {
 	public:
 		ShaderModuleCache(vk::Device device);
+		~ShaderModuleCache();
 
-		VKQuick::ShaderModule* GetCachedModule(const std::string& name) const;
+		VKQuick::ShaderModule* GetCachedModule(const std::string& name);
+	private:
+		vk::Device			m_sourceDevice;
 
-		VKQuick::ShaderModule* AddCachedModule(const std::string& name);
-		private:
-			vk::Device			m_sourceDevice;
-
-			std::vector<UniqueShaderModule> m_shaderModules;
+		std::unordered_map<std::string, ShaderModule*> m_shaderModules;
 	};
+
+	using UniqueShaderModuleCache = std::unique_ptr<ShaderModuleCache>;
+	using SharedShaderModuleCache = std::shared_ptr<ShaderModuleCache>;
 }

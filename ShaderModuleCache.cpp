@@ -13,16 +13,17 @@ ShaderModuleCache::ShaderModuleCache(vk::Device device) {
 	m_sourceDevice = device;
 }
 
-VKQuick::ShaderModule* ShaderModuleCache::GetCachedModule(const std::string& name) const {
+ShaderModuleCache::~ShaderModuleCache() {
 	for (auto& i : m_shaderModules) {
-		if (i->m_fileName == name) {
-			return i.get();
-		}
+		delete i.second;
 	}
-	return nullptr;
 }
 
-VKQuick::ShaderModule* ShaderModuleCache::AddCachedModule(const std::string& name) {
-	m_shaderModules.push_back(std::make_unique<ShaderModule>(name, m_sourceDevice));
-	return m_shaderModules.back().get();
+VKQuick::ShaderModule* ShaderModuleCache::GetCachedModule(const std::string& name) {
+	auto i = m_shaderModules.find(name);
+	if (i == m_shaderModules.end()) {
+		auto j = m_shaderModules.insert({ name , new ShaderModule(name, m_sourceDevice) });
+		return j.first->second;
+	}
+	return i->second;
 }
