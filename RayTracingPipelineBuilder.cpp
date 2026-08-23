@@ -160,7 +160,7 @@ void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::stri
 
 	pipeline.bindingTable.tableBuffer = m_memoryManager.CreateBuffer(
 		{
-			.size = bufferSize + (rayPipelineProperties.shaderGroupBaseAlignment * BindingTableOrder::MAX_SIZE),
+			.size = bufferSize * 20,
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress		|
 						vk::BufferUsageFlagBits::eTransferSrc				|
 						vk::BufferUsageFlagBits::eShaderDeviceAddressKHR	|
