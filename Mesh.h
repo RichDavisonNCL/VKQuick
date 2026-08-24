@@ -15,6 +15,7 @@ namespace VKQuick {
 		int start	= 0;
 		int count	= 0;
 		int base	= 0;
+		vk::GeometryFlagsKHR flags = vk::GeometryFlagBitsKHR::eOpaque;
 	};
 
 	struct AttributeData {
@@ -65,12 +66,12 @@ namespace VKQuick {
 
 		const std::vector<MeshRange>& GetRanges() const;
 
+		void	SetRangeFlag(uint32_t index, vk::GeometryFlagBitsKHR flag);
+
 		size_t GetVertexCount() const;
 		size_t GetIndexCount()  const;
 
 		bool	GetAttributeIndex(VKQuick::AttributeType type, size_t& index) const;
-
-		//size_t GetPositionAttributeIndex() const;
 
 		const VKQuick::Buffer& GetBuffer() const;
 

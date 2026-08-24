@@ -16,7 +16,7 @@ namespace VKQuick {
 	struct BVHInput {
 		VKQuick::Mesh* mesh;
 		vk::TransformMatrixKHR transform;
-		uint32_t	hitID = 0;
+		uint32_t	hitGroupOffset = 0;
 		uint32_t	mask = uint32_t(~0);
 		uint32_t	customIndex = 0;
 	};
@@ -40,6 +40,8 @@ namespace VKQuick {
 	public:
 		BVHBuilder(vk::Device inDevice, VKQuick::MemoryManager& inAllocator);
 		~BVHBuilder();
+
+		BVHBuilder& WithMesh(VKQuick::Mesh& m);
 
 		BVHBuilder& WithObject(BVHInput input);
 

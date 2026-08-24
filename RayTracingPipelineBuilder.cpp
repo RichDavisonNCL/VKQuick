@@ -23,22 +23,6 @@ RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithRecursionDepth(uint32_
 	return *this;
 }
 
-RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithRayGenGroup(uint32_t shaderIndex) {
-	vk::RayTracingShaderGroupCreateInfoKHR groupCreateInfo;
-	groupCreateInfo.type = vk::RayTracingShaderGroupTypeKHR::eGeneral;
-	groupCreateInfo.generalShader = shaderIndex;
-	m_genGroups.push_back(groupCreateInfo);
-	return *this;
-}
-
-RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithMissGroup(uint32_t shaderIndex) {
-	vk::RayTracingShaderGroupCreateInfoKHR groupCreateInfo;
-	groupCreateInfo.type = vk::RayTracingShaderGroupTypeKHR::eGeneral;
-	groupCreateInfo.generalShader = shaderIndex;
-	m_missGroups.push_back(groupCreateInfo);
-	return *this;
-}
-
 RayTracingPipelineBuilder& RayTracingPipelineBuilder::WithTriangleHitGroup(uint32_t closestHit, uint32_t anyHit) {
 	vk::RayTracingShaderGroupCreateInfoKHR groupCreateInfo;
 
@@ -74,6 +58,25 @@ RayPipeline RayTracingPipelineBuilder::Build(const std::string& debugName, vk::P
 	FillShaderLayouts(output);
 	
 	m_allGroups.clear();
+
+	for (int i = 0; i < m_moduleShaderStages.size(); ++i) {
+		if (m_moduleShaderStages[i] == vk::ShaderStageFlagBits::eRaygenKHR ||
+			m_moduleShaderStages[i] == vk::ShaderStageFlagBits::eMissKHR) {
+
+			vk::RayTracingShaderGroupCreateInfoKHR groupCreateInfo;
+			groupCreateInfo.type = vk::RayTracingShaderGroupTypeKHR::eGeneral;
+			groupCreateInfo.generalShader = i;
+
+			if (m_moduleShaderStages[i] == vk::ShaderStageFlagBits::eRaygenKHR) {
+				m_genGroups.push_back(groupCreateInfo);
+			}
+			if (m_moduleShaderStages[i] == vk::ShaderStageFlagBits::eMissKHR) {
+				m_missGroups.push_back(groupCreateInfo);
+			}
+		}
+	}
+
+
 	m_allGroups.insert(m_allGroups.end(), m_genGroups.begin() , m_genGroups.end());
 	m_allGroups.insert(m_allGroups.end(), m_missGroups.begin(), m_missGroups.end());
 	m_allGroups.insert(m_allGroups.end(), m_hitGroups.begin() , m_hitGroups.end());
@@ -156,11 +159,11 @@ void RayTracingPipelineBuilder::CreateSBT(RayPipeline& pipeline, const std::stri
 		pipeline.bindingTable.regions[i].stride = alignedHandleSize;
 		bufferSize += pipeline.bindingTable.regions[i].size;
 	}
-	pipeline.bindingTable.regions[0].stride = pipeline.bindingTable.regions[0].size;
+	pipeline.bindingTable.regions[0].stride = pipeline.bindingTable.regions[0].size; //This is just how the raygen region works
 
 	pipeline.bindingTable.tableBuffer = m_memoryManager.CreateBuffer(
 		{
-			.size = bufferSize * 20,
+			.size = bufferSize + (rayPipelineProperties.shaderGroupBaseAlignment * (BindingTableOrder::MAX_SIZE+1)),
 			.usage =	vk::BufferUsageFlagBits::eShaderDeviceAddress		|
 						vk::BufferUsageFlagBits::eTransferSrc				|
 						vk::BufferUsageFlagBits::eShaderDeviceAddressKHR	|

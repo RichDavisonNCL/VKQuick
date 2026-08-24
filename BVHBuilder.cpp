@@ -32,6 +32,10 @@ BVHBuilder& BVHBuilder::WithFlags(vk::BuildAccelerationStructureFlagsKHR flags) 
 	return *this;
 }
 
+BVHBuilder& BVHBuilder::WithMesh(VKQuick::Mesh& m) {
+	return *this;
+}
+
 BVHBuilder& BVHBuilder::WithObject(BVHInput input) {
 	auto savedMesh = m_uniqueMeshes.find(input.mesh);
 
@@ -96,7 +100,6 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 
 		BLASEntry& blasEntry = m_blasBuildInfo.back();
 
-
 		const std::vector<MeshRange>& ranges = i->GetRanges();
 
 		size_t subMeshCount = ranges.size();
@@ -111,7 +114,7 @@ void BVHBuilder::BuildBLAS(vk::BuildAccelerationStructureFlagsKHR inFlags) {
 			const MeshRange& m = ranges[j];
 
 			blasEntry.geometries[j].setGeometryType(vk::GeometryTypeKHR::eTriangles)
-												.setFlags(vk::GeometryFlagBitsKHR::eOpaque)
+												.setFlags(m.flags)
 												.geometry.setTriangles(triData);
 
 			blasEntry.geometries[j].geometry.triangles.maxVertex = m.count;
@@ -220,7 +223,7 @@ void BVHBuilder::BuildTLAS(vk::BuildAccelerationStructureFlagsKHR flags) {
 
 		tlasEntries[i].flags = (VkGeometryInstanceFlagBitsKHR)vk::GeometryInstanceFlagBitsKHR::eTriangleFacingCullDisable;
 		tlasEntries[i].mask = m_entries[i].mask;
-		tlasEntries[i].instanceShaderBindingTableRecordOffset = m_entries[i].hitID;
+		tlasEntries[i].instanceShaderBindingTableRecordOffset = m_entries[i].hitGroupOffset;
 		tlasEntries[i].instanceCustomIndex = (meshID & ((1 << 24)-1)) | (m_entries[i].customIndex << 24);
 	}
 

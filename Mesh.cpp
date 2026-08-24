@@ -45,6 +45,11 @@ bool Mesh::IsHostVisibleBuffer() const {
 	return false;
 }
 
+void	Mesh::SetRangeFlag(uint32_t index, vk::GeometryFlagBitsKHR flag) {
+	assert(index < m_meshRanges.size());
+	m_meshRanges[index].flags = flag;
+}
+
 const std::vector<MeshRange>& Mesh::GetRanges() const {
 	return m_meshRanges;
 }
