@@ -67,20 +67,14 @@ void ShaderModule::CombineLayoutBindings(std::vector<std::vector<vk::DescriptorS
 		outSet.resize(numBindings);
 
 		for (int j = 0; j < baseSet.size(); ++j) {
-			//if (baseSet[j].stageFlags != vk::ShaderStageFlags()) {
-				//Check that something hasn't gone wrong with the binding combo!
-				if (baseSet[j].descriptorType != outSet[j].descriptorType) {
-
-				}
-				if (baseSet[j].descriptorCount != outSet[j].descriptorCount) {
-
-				}
-				outSet[j].binding			= j;
-				outSet[j].descriptorCount	= baseSet[j].descriptorCount;
-				outSet[j].descriptorType	= baseSet[j].descriptorType;			
+			if (baseSet[j].descriptorType == vk::DescriptorType::eSampler && baseSet[j].descriptorCount == 0) {
+				continue; //Invalid set
+			}
+			outSet[j].binding			= j;
+			outSet[j].descriptorCount	= baseSet[j].descriptorCount;
+			outSet[j].descriptorType	= baseSet[j].descriptorType;			
 				
-				outSet[j].stageFlags		|= layoutStage; //Combine sets across shader stages
-			//}
+			outSet[j].stageFlags		|= layoutStage; //Combine sets across shader stages
 		}
 	}
 }
@@ -89,22 +83,12 @@ void ShaderModule::CombinePushConstantRanges(std::vector< vk::PushConstantRange>
 	for (int i = 0; i < m_pushConstants.size(); ++i) {
 		bool found = false;
 		for (int j = 0; j < inoutRanges.size(); ++j) {
-			////We've already registered a push constant for this stage
-			////so we can extend it to encompass this one
-			//if (inoutRanges[j].stageFlags == layoutStage) {
-			//	inoutRanges[j].offset	= std::min(inoutRanges[j].offset, m_pushConstants[i].offset);
-			//	inoutRanges[j].size		= std::max(inoutRanges[j].size, m_pushConstants[i].size);
-			//	found = true;
-			//	break;
-			//}
-
 			if (m_pushConstants[i].offset == inoutRanges[j].offset &&
 				m_pushConstants[i].size == inoutRanges[j].size) {
 				inoutRanges[j].stageFlags |= layoutStage;
 				found = true;
 				break;
 			}
-
 		}
 		if (!found) {
 			inoutRanges.push_back(m_pushConstants[i]);
