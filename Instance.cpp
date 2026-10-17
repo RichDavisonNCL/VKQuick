@@ -261,8 +261,12 @@ bool Instance::InitSurface() {
 
 	if (m_vkInit.useHDRSurface) {
 		for (auto& i : formats) {
+			// Match on colour space as well as format: without VK_EXT_swapchain_colorspace
+			// only sRGB nonlinear is legal, and NVIDIA lists the 10-bit formats paired
+			// with HDR10_ST2084 first, which the compositor would then decode as PQ
 			if ((uint64_t)i.format >= VK_FORMAT_A2R10G10B10_UNORM_PACK32 &&
-				(uint64_t)i.format <= VK_FORMAT_A2B10G10R10_SINT_PACK32)
+				(uint64_t)i.format <= VK_FORMAT_A2B10G10R10_SINT_PACK32 &&
+				i.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear)
 			{
 				m_surfaceFormat = i.format;
 				m_surfaceSpace = i.colorSpace;
